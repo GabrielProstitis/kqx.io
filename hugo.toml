@@ -1,8 +1,8 @@
 baseURL = 'https://example.org/'
-languageCode = 'en-us'
-title = 'kpwn-blog'
 theme = 'risotto'
-author = "leave & prosti"
+title = "kqx-pwn"
+author = 'leave'
+languageCode = 'en-us'
 DefaultContentLanguage = "en"
 enableInlineShortcodes = true
 # prevent build failures when using Hugo's Instagram shortcode due to deprecated Instagram API.
