@@ -80,3 +80,11 @@ popf
 ```
 
 Thanks to **@Erge** for finding such path <3
+
+## Lore moment
+fetipop should have been my challenge for [TRXCTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided to not release in order not to leak the technique and give a shot to kctf. <br>
+[Try it out ;)](/attachments/fetipop.zip)
+
+**what does the first "p" stand for in fetipop?** <br>
+fetipop is a meme name we came up for the chall after writing it. <br>
+Basically trying to name the technique (IOP) we were (as a joke) considering various options like "Fault OP", "Exception OP", "Trap OP" and, of course, "Interrupt OP". We then merged them all together in `fetiop`, the last "p" was casually mentioned by **@Erge** because of an inside joke of ours, we only know what its real meaning is and we won't elaborate any further. 
