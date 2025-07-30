@@ -68,3 +68,8 @@ unsafe = true
     startLevel = 2
     endLevel   = 3
     ordered    = true
+
+# For github pages
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
