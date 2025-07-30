@@ -2,7 +2,7 @@
 title = 'krwx'
 date = 2025-07-29T22:30:31+02:00
 draft = false
-author = 'leave & prosti'
+author = 'prosti'
 summary = 'Writeup for the kernel pwn challenge that I wrote for ToH CTF 2025. In this post I will talk about a way of **bypassing kCFI** (norand) using **BPF filters**.'
 tags = [
     'linux',
