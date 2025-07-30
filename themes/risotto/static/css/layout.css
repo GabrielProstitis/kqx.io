@@ -72,7 +72,7 @@
 
 .post__header::before {
     font-size: 21px !important;
-    content: ">"
+    content: "> "
 }
 
 .post__header {
