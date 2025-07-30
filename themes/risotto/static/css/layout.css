@@ -71,6 +71,7 @@
 }
 
 .post__header::before {
+    font-size: 21px !important;
     content: ">"
 }
 
@@ -79,7 +80,8 @@
 }
 
 .post__link {
-    color: var(--base09) !important
+    color: var(--base09) !important;
+    font-size: 21px !important;
 }
 
 .post__summary {
@@ -90,7 +92,7 @@
 }
 
 .post__tags {
-    margin-left: 22px;
+    margin-left: 25px;
 }
 
 .post__tag {
@@ -99,5 +101,5 @@
     display: inline-block;
     color: var(--tag-fg);
     background-color: var(--tag-bg);
-    font-size: 15px;
+    font-size: 14px;
 }

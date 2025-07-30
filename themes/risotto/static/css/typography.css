@@ -47,7 +47,7 @@ h5+h6 {
     margin: 0;
 }
 
-h1:before { font-size: 24px; color: var(--base09); }
+h1:before { content: "# "; font-size: 24px; color: var(--base09); }
 h2:before { content: "## "; }
 h3:before { content: "### "; }
 h4:before { content: "#### "; }

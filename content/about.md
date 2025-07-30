@@ -7,7 +7,7 @@ author = "leave & prosti"
 <br>
 Welcome to kqx!
 <br>
-We are two CTF players that enjoy breaking stuff, especially qemu. <br><br>
+We are two CTF players that enjoy breaking stuff that have to do with x86, linux and qemu. <br><br>
 
 Manuele Pandolfi (**@leave**):
 * pwner for [TRX](https://theromanxpl0.it/)
