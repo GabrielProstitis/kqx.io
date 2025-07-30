@@ -1,0 +1,24 @@
+{{ define "main" }}
+    {{ range .Pages }}
+    <article class="post">
+        <header class="post__header">
+            <a class="post__link" href="{{ .Permalink }}">{{ .Title | markdownify }}</a>
+        </header>
+
+        <section class="post__summary">
+            {{ .Summary }}
+        </section>
+        
+        <section class="post__tags">
+            {{ range .Params.tags }}
+                <span class="post__tag"> {{ . }} </span>
+            {{ end }}
+        </section>
+        
+    </article>
+    {{ end }}
+{{ end }}
+
+{{define "aside" }}
+    {{ if .Params.description }}<p>{{ .Params.description }}</p>{{ end }}
+{{ end }}
