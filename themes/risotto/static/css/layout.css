@@ -1,7 +1,7 @@
 /* 1rem = 16px by default */
 
 .page {
-    max-width: 80rem;
+    max-width: 70rem;
     margin: 1rem auto;
     display: grid;
     grid-template-areas:
