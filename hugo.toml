@@ -1,6 +1,6 @@
 baseURL = 'https://example.org/'
 theme = 'risotto'
-title = "kqx-pwn"
+title = "kqx"
 author = 'leave'
 languageCode = 'en-us'
 DefaultContentLanguage = "en"
@@ -23,12 +23,9 @@ palette = "base16-dark"
 
 # Sidebar: about/bio
 [params.about]
-title = "risotto"
-description = "A [hugo](https://gohugo.io) theme inspired by terminal ricing."
+title = "kqx"
 # unicode/emoji logo:
-logo = "🍚"
-# or use an image:
-#logo_image = "images/rice.svg"
+logo = "</>"
 
 # Sidebar: social links
 # Available icon sets:
@@ -38,17 +35,13 @@ logo = "🍚"
 [[params.socialLinks]]
 icon = "fa-brands fa-github"
 title = "GitHub"
-url = "https://github.com/joeroe/risotto"
+url = "https://github.com/GabrielProstitis"
 
 [[params.socialLinks]]
 icon = "fa-solid fa-envelope"
 title = "Email"
-url = "mailto:example@example.com"
+url = "mailto:prostitisgabriel@gmail.com"
 
-[[params.socialLinks]]
-icon = "ai ai-orcid"
-title = "ORCID"
-url = "https://orcid.org/0000-0001-2345-6789"
 
 [menu]
 
@@ -75,30 +68,3 @@ unsafe = true
     startLevel = 2
     endLevel   = 3
     ordered    = true
-
-[privacy]
-
-  [privacy.vimeo]
-    disabled = false
-    simple = true
-
-  [privacy.twitter]
-    disabled = false
-    enableDNT = true
-    simple = true
-
-  [privacy.instagram]
-    disabled = false
-    simple = true
-
-  [privacy.youtube]
-    disabled = false
-    privacyEnhanced = true
-
-[services]
-
-  [services.instagram]
-    disableInlineCSS = true
-
-  [services.twitter]
-    disableInlineCSS = true

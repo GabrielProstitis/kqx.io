@@ -6,14 +6,17 @@
     display: grid;
     grid-template-areas:
       "header"
-      "body"
       "aside"
+      "body"
       "footer";
     grid-template-columns: minmax(0, 1fr); /* https://css-tricks.com/preventing-a-grid-blowout/ */
     grid-row-gap: 2rem;
 }
 
 @media (min-width: 45rem) {
+    .page__aside {
+        position: sticky !important;
+    }
     .page {
         grid-template-areas:
           "header  header"
@@ -22,6 +25,7 @@
         grid-template-columns: minmax(0, 1fr) 15rem;
         grid-column-gap: 2rem;
     }
+
 }
 
 /* Header */
@@ -50,7 +54,7 @@
 .page__aside {
     grid-area: aside;
     color: var(--off-fg);
-    position: sticky;
+    position: static;
     top: 1rem;
     right: 1rem;
     overflow-y: auto;
@@ -95,5 +99,5 @@
     display: inline-block;
     color: var(--tag-fg);
     background-color: var(--tag-bg);
-    /* font-size: 14px; */
+    font-size: 15px;
 }

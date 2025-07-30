@@ -7,10 +7,13 @@ author = "leave & prosti"
 <br>
 Welcome to kqx!
 <br>
-We are two CTF players for TRX that love to break stuff and in this blog we will do just that!<br><br>
+We are two CTF players that enjoy breaking stuff, especially qemu. <br><br>
 
 Manuele Pandolfi (**@leave**):
-* second best kpwner in Italy
+* pwner for [TRX](https://theromanxpl0.it/)
+* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2025)
 
 Gabriel Prostitis (**@prosti**):
-* best kpwner in Italy
+* pwner for [TRX](https://theromanxpl0.it/) and [ToH](https://towerofhanoi.it/)
+* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)
+* student @ [polimi](https://www.polimi.it/)
