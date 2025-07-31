@@ -8,6 +8,7 @@
       "header"
       "aside"
       "body"
+      "about"
       "footer";
     grid-template-columns: minmax(0, 1fr); /* https://css-tricks.com/preventing-a-grid-blowout/ */
     grid-row-gap: 2rem;
@@ -17,6 +18,11 @@
     .page__aside {
         position: sticky !important;
     }
+
+    .page__about {
+        grid-area: aside;
+    }
+
     .page {
         grid-template-areas:
           "header  header"
@@ -25,7 +31,21 @@
         grid-template-columns: minmax(0, 1fr) 15rem;
         grid-column-gap: 2rem;
     }
+    
+    .about {
+        margin-top: 50px;
+    }
 
+}
+
+@media (max-width: 45rem) {
+    .page__about {
+        grid-area: about;
+    }
+
+    .about {
+        margin-left: 10px;
+    }
 }
 
 /* Header */
@@ -54,6 +74,15 @@
 
 .page__aside {
     grid-area: aside;
+    color: var(--off-fg);
+    position: static;
+    top: 1rem;
+    right: 1rem;
+    overflow-y: auto;
+    max-height: 95vh;
+}
+
+.page__about {
     color: var(--off-fg);
     position: static;
     top: 1rem;
@@ -104,4 +133,13 @@
     background-color: var(--tag-bg);
     font-size: 14px;
     margin-left: 5px;
+}
+
+.about__social-links {
+    margin-top: 25px;
+    font-size: 17px;
+}
+
+.about__social-icons {
+    margin-top: 5px;
 }

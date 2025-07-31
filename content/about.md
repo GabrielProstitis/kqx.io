@@ -1,7 +1,9 @@
 +++
 title = "about"
 aliases = ["about-us", "about-kqx", "contact"]
+social = true
 +++
+
 <br>
 Welcome to kqx!
 <br>

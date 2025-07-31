@@ -12,15 +12,3 @@
     content: none;
 }
 
-/* Social media links */
-.aside__social-links {
-    padding: 0;
-}
-
-.aside__social-links li {
-    display: inline-block;
-}
-
-.aside__social-links li::marker {
-    content: none;
-}

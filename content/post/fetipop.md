@@ -82,7 +82,7 @@ popf
 Thanks to **@Erge** for finding such path <3
 
 ## Lore moment
-fetipop should have been my challenge for [TRXCTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided to not release in order not to leak the technique and give a shot to kctf. <br>
+fetipop should have been my challenge for [TRXCTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided not to release in order not to leak the technique and give a shot to kctf. <br>
 [Try it out ;)](/kpwn-blog/attachments/fetipop.zip)
 
 **what does the first "p" stand for in fetipop?** <br>

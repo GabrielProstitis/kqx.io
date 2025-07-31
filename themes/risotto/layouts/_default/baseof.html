@@ -16,11 +16,20 @@
                 {{- block "main" . }}{{- end }}
             </section>
             
-            <section class="page__aside">
-                <div class="aside__content">
-                    {{- block "aside" . }}{{- end }}
+            {{if not .Params.social}}
+                <section class="page__aside">
+                    <div>
+                        {{- block "aside" . }}{{- end }}
+                    </div>
+                </section>
+            {{end}}
+
+            <section class="page__about">
+                <div>
+                    {{- block "about" . }}{{- end }}
                 </div>
             </section>
+
 
             <footer class="page__footer">
                 {{- partial "footer.html" . -}}

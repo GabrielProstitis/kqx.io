@@ -18,10 +18,34 @@
     {{ end }}
 
     {{ if and (.Params.toc) (.TableOfContents) }}
-	    <hr>
-	    On this page:
+        <hr>
+        On this page:
         <section class="post__toc">
-	        {{ .TableOfContents }}
+            {{ .TableOfContents }}
         </section>
     {{ end }}
+
 {{ end }}
+
+{{define "about" }}
+    {{if .Params.social}}
+        <section class="about">
+            <i>"We fear no undocumented behaviour"</i>
+        
+            {{ range $user := .Site.Params.users }}
+                <section class="about__social-links">   
+                    <strong>@{{$user.name}}</strong> 
+                    
+                    <section class="about__social-icons">
+                        {{ range $link := $user.socialLinks}}
+                            <a href="{{ $link.url }}" rel="me" aria-label="{{ $link.title }}" title="{{ $link.title }}"><i class="{{ $link.icon }}"></i></a>&nbsp;
+                        {{end}}
+                    </section>
+                    
+                </section>
+            {{ end }}
+
+        </section>
+    {{end}}
+
+{{end}}

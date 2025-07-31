@@ -32,21 +32,41 @@ logo = "</>"
 # * FontAwesome 6 <https://fontawesome.com/> ('fa-brands', 'fa-normal', or 'fa-solid' for brands)
 # * Academicons <https://jpswalsh.github.io/academicons> ('ai ai-')
 
-[[params.socialLinks]]
-icon = "fa-brands fa-github"
-title = "GitHub-prosti"
-url = "https://github.com/GabrielProstitis"
+[[params.users]]
+name = "leave"
 
-[[params.socialLinks]]
-icon = "fa-solid fa-envelope"
-title = "Email-prosti"
-url = "mailto:prostitisgabriel@gmail.com"
+  [[params.users.socialLinks]]
+    icon = "fa-brands fa-github"
+    title = "GitHub"
+    url = "https://github.com/manuele-pandolfi"
 
+  [[params.users.socialLinks]]
+    icon = "fa-brands fa-x-twitter"
+    title = "X"
+    url = "https://x.com/_leave07"
 
-[[params.socialLinks]]
-icon = "fa-solid fa-X"
-title = "X-prosti"
-url = "https://x.com/___prosti"
+  [[params.users.socialLinks]]
+    icon = "fa-solid fa-envelope"
+    title = "Email"
+    url = "mailto:manuele.pand@gmail.com"
+
+[[params.users]]
+name = "prosti"
+
+  [[params.users.socialLinks]]
+  icon = "fa-brands fa-github"
+  title = "GitHub"
+  url = "https://github.com/GabrielProstitis"
+
+  [[params.users.socialLinks]]
+  icon = "fa-brands fa-x-twitter"
+  title = "X"
+  url = "https://x.com/___prosti"
+
+  [[params.users.socialLinks]]
+  icon = "fa-solid fa-envelope"
+  title = "Email"
+  url = "mailto:prostitisgabriel@gmail.com"
 
 [menu]
 
