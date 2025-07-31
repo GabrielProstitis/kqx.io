@@ -1,7 +1,7 @@
-baseURL = 'https://example.org/'
+baseURL = 'http://kqx.io'
 theme = 'risotto'
 title = "kqx"
-author = 'leave'
+author = 'leave & prosti'
 languageCode = 'en-us'
 DefaultContentLanguage = "en"
 enableInlineShortcodes = true
@@ -34,14 +34,19 @@ logo = "</>"
 
 [[params.socialLinks]]
 icon = "fa-brands fa-github"
-title = "GitHub"
+title = "GitHub-prosti"
 url = "https://github.com/GabrielProstitis"
 
 [[params.socialLinks]]
 icon = "fa-solid fa-envelope"
-title = "Email"
+title = "Email-prosti"
 url = "mailto:prostitisgabriel@gmail.com"
 
+
+[[params.socialLinks]]
+icon = "fa-solid fa-X"
+title = "X-prosti"
+url = "https://x.com/___prosti"
 
 [menu]
 
