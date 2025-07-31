@@ -1,8 +1,6 @@
 +++
 title = "about"
-date = 2025-07-29T22:30:31+02:00
 aliases = ["about-us", "about-kqx", "contact"]
-author = "leave & prosti"
 +++
 <br>
 Welcome to kqx!

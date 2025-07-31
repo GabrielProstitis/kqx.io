@@ -46,6 +46,7 @@
 /* Body + aside */
 .page__body {
     grid-area: body;
+    margin: 1rem;
     background-color: var(--off-bg);
     box-shadow: 0 0 0 1rem var(--off-bg);
     overflow-wrap: break-word;
@@ -102,4 +103,5 @@
     color: var(--tag-fg);
     background-color: var(--tag-bg);
     font-size: 14px;
+    margin-left: 5px;
 }
