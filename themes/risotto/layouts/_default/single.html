@@ -38,8 +38,32 @@
                     
                     <section class="about__social-icons">
                         {{ range $link := $user.socialLinks}}
-                            <a href="{{ $link.url }}" rel="me" aria-label="{{ $link.title }}" title="{{ $link.title }}"><i class="{{ $link.icon }}"></i></a>&nbsp;
-                        {{end}}
+							{{ if eq $link.title "Discord" }}
+								<div id="copyBubble" class="copy-bubble">Copied!</div>
+
+								<script>
+									function showCopyBubble(el) {
+										let bubble = el.querySelector('.copy-bubble');
+										if (!bubble) {
+											bubble = document.createElement('div');
+											bubble.className = 'copy-bubble';
+											bubble.textContent = 'Copied!';
+											el.appendChild(bubble);
+										}
+										bubble.style.opacity = 1;
+										bubble.style.transform = 'translateY(23px)';
+										setTimeout(() => {
+											bubble.style.opacity = 0;
+											bubble.style.transform = 'translateY(10px)';
+										}, 700);
+									}
+								</script>
+
+								<a aria-label="{{ $link.title }}" title="{{ $link.title }}" onclick="navigator.clipboard.writeText('{{ $link.url }}').then(()=>showCopyBubble(this.parentNode))"><i class="{{ $link.icon }}"></i></a>&nbsp;
+							{{else}}
+                            	<a href="{{ $link.url }}" rel="me" aria-label="{{ $link.title }}" title="{{ $link.title }}"><i class="{{ $link.icon }}"></i></a>&nbsp;
+							{{end}}
+						{{end}}
                     </section>
                     
                 </section>
@@ -48,4 +72,4 @@
         </section>
     {{end}}
 
-{{end}}
+{{end}}	

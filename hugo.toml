@@ -36,6 +36,11 @@ logo = "</>"
 name = "leave"
 
   [[params.users.socialLinks]]
+    icon = "fa-brands fa-discord"
+    title = "Discord"
+    url = "leave07"
+
+  [[params.users.socialLinks]]
     icon = "fa-brands fa-github"
     title = "GitHub"
     url = "https://github.com/manuele-pandolfi"
@@ -52,6 +57,11 @@ name = "leave"
 
 [[params.users]]
 name = "prosti"
+
+  [[params.users.socialLinks]]
+    icon = "fa-brands fa-discord"
+    title = "Discord"
+    url = ".prosti."
 
   [[params.users.socialLinks]]
   icon = "fa-brands fa-github"
@@ -75,6 +85,12 @@ name = "prosti"
     name = "About"
     url = "/about/"
     weight = 10
+
+	[[menu.main]]
+    identifier = "writeups"
+    name = "Writeups"
+    url = "/writeups/"
+    weight = 0
 
 [taxonomies]
 category = "categories"

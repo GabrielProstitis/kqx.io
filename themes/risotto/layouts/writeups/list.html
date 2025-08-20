@@ -1,0 +1,21 @@
+{{ define "main" }}
+    <h1>writeup</h1><br>
+    {{ range .Pages }}
+    <article class="post">
+        <header class="post__header">
+            <a class="post__link" href="{{ .Permalink }}">{{ .Title | markdownify }}</a>
+        </header>
+
+        <section class="post__summary">
+            {{ .Summary }}
+        </section>
+        
+        <section class="post__tags">
+            {{ range .Params.tags }}
+                <span class="post__tag"> {{ . }} </span>
+            {{ end }}
+        </section>
+        
+    </article>
+    {{ end }}
+{{ end }}
