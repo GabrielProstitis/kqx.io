@@ -3,7 +3,7 @@ title = 'fetipop'
 date = 2025-07-30T16:06:05+02:00
 draft = false
 author = 'leave'
-summary = 'novel technique I found in the linux kernel useful to exploit restricted dirty pagetable scenarios in a completely reliable and leakless way, through a new kind of "Oriented Programming"'
+summary = 'novel technique I found in the linux kernel useful to exploit restricted dirty pagetable scenarios in a completely reliable and leakless way, through a new kind of "Oriented Programming".'
 tags = [
     'linux',
     'novel',
