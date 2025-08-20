@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><title>pwning linux with... &#34;QEMU&#34;?? &ndash; kqx</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8"/>
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha512-IW0nhlW5MgNydsXJO40En2EoCkTTjZhI3yuODrZIc8cQ4h1XcF53PsqDHa09NqnkXuIe0Oiyyj171BqZFwISBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<link rel="stylesheet" href="http://localhost:1313/css/palettes/base16-dark.css">
+<link rel="stylesheet" href="http://localhost:1313/css/risotto.css">
+<link rel="stylesheet" href="http://localhost:1313/css/custom.css">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="pwning linux with... &#34;QEMU&#34;?? &ndash; kqx" />
+<meta property="og:url" content="http://localhost:1313/post/fw_cfg/" />
+
+  
+    <meta property="og:description" content=""/> 
+  
+
+<meta property="og:locale" content="en-us" />
+<meta property="og:image" content="" /></head>
+
+    <body>
+        <div class="page">
+
+            <header class="page__header"><nav class="page__nav main-nav">
+    <ul>
+      <li class="nomarker"><h1 class="page__logo"><a href="http://localhost:1313/" class="page__logo-inner">kqx</a></h1></li>
+    
+    
+    <li class="main-nav__item"><a class="nav-main-item" href="http://localhost:1313/about/" title="">About</a></li>
+    
+    <li class="main-nav__item"><a class="nav-main-item active" href="http://localhost:1313/post/" title="Posts">Posts</a></li>
+    
+    </ul>
+</nav>
+
+</header>
+            
+            <section class="page__body">
+    <header class="content__header">
+        <h1>pwning linux with&hellip; &ldquo;QEMU&rdquo;??</h1>
+    </header>
+    <div class="content__body">
+        <h2 id="its-kalmars-fault">It&rsquo;s Kalmar&rsquo;s fault</h2>
+<p>During KalmarCTF 2025 there was a painfully cool challenge, &ldquo;Maestro 2&rdquo;. The objective of the challenge was to pwn a custom kernel written in rust. The kernel was not patched and no modules written by the author where loaded so the player had to find an actual bug in the latest implementation of the kernel.<br>
+As soon as I (<strong>@prosti</strong>) saw that it was a custom kernel I thought about a blog post that <strong>@c0mm4nd_</strong> had sent me a few months beforehand.</p>
+<p>Link al post. Breve sintesi. Dire che maestro era vulnerabile.</p>
+<h2 id="fw_cfg">fw_cfg</h2>
+<h3 id="how-it-works">How it works</h3>
+<p>Spiegazione di come funziona il device usando solo porte I/O.
+Link a documentazione ufficiale + osdev.</p>
+<h3 id="accessable-files">Accessable files</h3>
+<p>Lista di file a cui posso accedere</p>
+<h3 id="using-dma-transfers">Using DMA transfers</h3>
+<p>Come funziona un DMA transfer con questo device</p>
+<h2 id="exploiting-iopl-privilege-escalation">Exploiting IOPL privilege escalation</h2>
+<p>Dire che solitamente basta initrd.
+Come ottenere arb phys write.
+Link a /dev/mem per brutino.
+Patch <code>__sys_setuid</code> oppure shellcode per nsjail escape.</p>
+<h2 id="exploit">Exploit</h2>
+
+    </div>
+    <footer class="content__footer"></footer>
+
+            </section>
+            
+            
+                <section class="page__aside">
+                    <div>
+    <p>This post is about exploiting IOPL privilege escalation using QEMU&#39;s Firmware Configuration (fw_cfg) device.</p>
+    
+        <p>
+            By prosti &amp; leave, 
+            2025-08-05
+        </p>
+    
+
+    
+        <hr>
+        On this page:
+        <section class="post__toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#its-kalmars-fault">It&rsquo;s Kalmar&rsquo;s fault</a></li>
+    <li><a href="#fw_cfg">fw_cfg</a>
+      <ol>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#accessable-files">Accessable files</a></li>
+        <li><a href="#using-dma-transfers">Using DMA transfers</a></li>
+      </ol>
+    </li>
+    <li><a href="#exploiting-iopl-privilege-escalation">Exploiting IOPL privilege escalation</a></li>
+    <li><a href="#exploit">Exploit</a></li>
+  </ol>
+</nav>
+        </section>
+    
+
+
+                    </div>
+                </section>
+            
+
+            <section class="page__about">
+                <div>
+    
+
+
+                </div>
+            </section>
+
+
+            <footer class="page__footer"><p>
+    
+    
+    
+    
+    
+    
+      
+    
+      
+    
+    
+    
+      
+      
+          
+            
+            
+                <br/><span class="active">$ echo $LANG<br/><b></b></span><br/>
+
+            
+          
+      
+    
+</p>
+<br /><br />
+<p class="advertisement" style="margin-left: 5px; font-size: 14px;">Made with love by <strong>@leave</strong> & <strong>@prosti</strong>.</p>
+</footer>
+
+        </div>
+    </body>
+
+</html>

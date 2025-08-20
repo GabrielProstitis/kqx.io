@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kqx</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on kqx</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 05 Aug 2025 19:24:38 +0200</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>pwning linux with... &#34;QEMU&#34;??</title>
+      <link>http://localhost:1313/post/fw_cfg/</link>
+      <pubDate>Tue, 05 Aug 2025 19:24:38 +0200</pubDate>
+      <guid>http://localhost:1313/post/fw_cfg/</guid>
+      <description>This post is about exploiting IOPL privilege escalation using QEMU&amp;rsquo;s Firmware Configuration (fw_cfg) device.</description>
+    </item>
+    <item>
+      <title>fetipop</title>
+      <link>http://localhost:1313/post/fetipop/</link>
+      <pubDate>Wed, 30 Jul 2025 16:06:05 +0200</pubDate>
+      <guid>http://localhost:1313/post/fetipop/</guid>
+      <description>novel technique I found in the linux kernel useful to exploit restricted dirty pagetable scenarios in a completely reliable and leakless way, through a new kind of &amp;ldquo;Oriented Programming&amp;rdquo;.</description>
+    </item>
+    <item>
+      <title>krwx</title>
+      <link>http://localhost:1313/post/krwx/</link>
+      <pubDate>Tue, 29 Jul 2025 22:30:31 +0200</pubDate>
+      <guid>http://localhost:1313/post/krwx/</guid>
+      <description>Writeup for the kernel pwn challenge that I wrote for ToH CTF 2025. In this post I will talk about a way of bypassing kCFI (norand) using BPF filters.</description>
+    </item>
+    <item>
+      <title>about</title>
+      <link>http://localhost:1313/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/about/</guid>
+      <description>&lt;br&gt;&#xA;Welcome to kqx!&#xA;&lt;br&gt;&#xA;We are two CTF players that enjoy breaking stuff that have to do with x86, linux and qemu. &lt;br&gt;&lt;br&gt;&#xA;&lt;p&gt;Manuele Pandolfi (&lt;strong&gt;@leave&lt;/strong&gt;):&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;pwner for &lt;a href=&#34;https://theromanxpl0.it/&#34;&gt;TRX&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;member of &lt;a href=&#34;https://teamitaly.eu/&#34;&gt;TeamItaly&lt;/a&gt; 🇮🇹 (2025)&lt;/li&gt;&#xA;&lt;li&gt;student @ jk still a kiddo, when I&amp;rsquo;ll start uni I&amp;rsquo;ll let you know&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Gabriel Prostitis (&lt;strong&gt;@prosti&lt;/strong&gt;):&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;pwner for &lt;a href=&#34;https://theromanxpl0.it/&#34;&gt;TRX&lt;/a&gt; and &lt;a href=&#34;https://towerofhanoi.it/&#34;&gt;ToH&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;member of &lt;a href=&#34;https://teamitaly.eu/&#34;&gt;TeamItaly&lt;/a&gt; 🇮🇹 (2024, 2025)&lt;/li&gt;&#xA;&lt;li&gt;student @ &lt;a href=&#34;https://www.polimi.it/&#34;&gt;polimi&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+  </channel>
+</rss>
