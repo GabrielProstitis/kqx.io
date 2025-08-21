@@ -1,9 +1,9 @@
 +++
 title = 'make cpu-entry-area great again'
-date = 2025-08-21T17:34:11+02:00
+date = 2025-08-22T00:18:48+02:00
 draft = true
 author = 'leave'
-summary = "Let an old linux novel technique to bypass SMAP reborn through an unimplemented x86 specification in QEMU's TCG"
+summary = "Reviving an old linux novel technique to bypass SMAP through an unimplemented x86 feature in QEMU's TCG"
 tags = [
     'qemu',
     'x86',
@@ -14,10 +14,12 @@ toc = true
 
 ## Intro
 The linux documentation describes **cpu_entry_area** as <br> 
-```fffffe0000000000 - fffffe7fffffffff (=39 bits) cpu_entry_area mapping``` <br>
+```c
+0xfffffe0000000000 - 0xfffffe7fffffffff (=39 bits) cpu_entry_area mapping
+``` 
 implemented with the struct <br>
 
-```
+```c
 struct cpu_entry_area {
 	char gdt[PAGE_SIZE];
 
@@ -63,7 +65,7 @@ struct cpu_entry_area {
 
 Ignoring the the 32bit definitions, the objects that are mapped in this area are:
  - GDT
- - sp0
+ - SP0 (**entry_stack_page**)
  - TSS
  - IST1
  - IST2
@@ -73,33 +75,33 @@ Ignoring the the 32bit definitions, the objects that are mapped in this area are
 
 To this we can add the IDT at the beginning. <br>
 
-## What is sp0
-Whenever a whatever ring tries to call an interrupt with an higher DPL (which describes which ring we are switching to through that interrupt) the stack must be changed to a more privileged one. When switching to ring N (from a lower ring) spN will be assinged as the stack pointer. <br>
-Note: Given that sp3 is conceptually useless because there are no rings lower than 3, sps goes from 0 to 2. In linux ring 1 and 2 are not used, thus the only sp used in linux is actually sp0. <br>
+## What is SP0
+Whenever a generic ring tries to call an interrupt with a higher DPL (which describes which ring we are switching to through that interrupt) the stack must be changed to a "more privileged" one. When switching to ring **N** (from a lower ring) **SPN** will be assinged as the stack pointer. <br><br>
+*Note*: Given that sp3 is conceptually useless because there are no rings lower than 3, we just have SPs from 0 to 2. In linux ring 1 and 2 are not used, thus the only sp used in linux is actually **SP0**. <br><br>
 Sps are fetched from the TSS. https://elixir.bootlin.com/linux/v6.16/source/arch/x86/include/asm/processor.h#L308 <br>
 So this stack is used as a temporary stack to complete the context switch from ring 3 to ring 0 by pushing onto it the userland context as the **pt_regs** struct. <br>
 
 ## CVE-2023-0597
-Before linux 6.2 cpu_entry_area was subject to no randomizations, but rather mapped to a fixed address being 0xfffffe0000001000 (address 0xfffffe0000000000 contains the IDT). <br>
-This led to the possibility for an attacker to have user controlled data (through sp0 and pt_regs) in a predictable address in kernelspace, which can be useful to fake structs or store ROPchains. <br>
+Before linux 6.2 **cpu_entry_area** was subject to no randomizations, but rather mapped to a fixed address being **0xfffffe0000001000** (address **0xfffffe0000000000** contains the IDT). <br>
+This led to the possibility for an attacker to have user controlled data (through **SP0** and pt_regs) in a predictable address in kernelspace, which can be useful to fake structs or store ROPchains. <br>
 With linux 6.2 the function **cea_offset** has been introduced, which, when kASLR is enabled, randomizes the offset of cpu_entry_area from the IDT (which is still at the constant address 0xfffffe0000000000). <br>
 
 ## SGDT
-Store GDT (SGDT) is an x86 **ring 3** (sometimes) instruction that returns the address and the size of the GDT. <br>
-It's clear how this instruction completely invalidates the **cea_offset** patch, given that we can retrive the GDT address (and thus the sp0 address) as an unprivileged user just by executing the SGDT instruction. <br>
+Store GDT (**SGDT**) is an x86 **ring 3** (sometimes) instruction that returns the address and the size of the GDT. <br>
+It's clear how this instruction completely invalidates the **cea_offset** patch, given that we can retrive the GDT address (and thus the **SP0** address) as an unprivileged user just by executing the SGDT instruction. <br>
 Well, kind of.
 
 ## UMIP
-UserMode Instruction Prevention (UMIP) is the 11th bit of CR4, which, as the Intel sdm states: <br>
-"_When set, the following instructions cannot be executed if CPL > 0: SGDT, SIDT, SLDT, SMSW, and STR. An attempt at such execution causes a general protection exception (#GP)._"
+User Mode Instruction Prevention (**UMIP**) is the 11th bit of CR4, which, as the Intel sdm states: <br>
+> "_When set, the following instructions cannot be executed if CPL > 0: SGDT, SIDT, SLDT, SMSW, and STR. An attempt at such execution causes a general protection exception (#GP)._"
 
 ### UMIP in QEMU
 ![umip](/images/sp0/umip.png)
-The only mitigation that makes the patch for CVE-2023-0597 hold isn't implemented in qemu, which means that we can have around 15 qword of arbitrary data in kernelspace context.
+The only mitigation that makes the patch for **CVE-2023-0597** hold isn't implemented in QEMU, which means that we can have around 15 qword of arbitrary data in kernelspace context.
 
 ## GPF not GPFing
 As previously said, if UMIP is on and a ring 3 tries to execute the SGDT instruction a GPF should be issued. <br>
-Well _in linux_ it ain't happening. What actually happens is that some junk values are returned. <br>
+Well _in linux_ it isn't happening. What actually happens is that some junk values are returned. <br>
 
 **SGDT**: address: **0xfffffffffffe0000**; size: **0** <br>
 **SIDT**: address: **0xffffffffffff0000**; size: **0** <br>
@@ -113,9 +115,9 @@ So what's happening is:
  - emulate the instruction;
 
 When UMIP was first introduced in x86 CPUs some programs would stop working (e.g WineHQ) because they were actually using some of these instructions. <br>
-So Linux decided to "force" them to be ring 3 but with the CVE-2023-0597 fix by replacing the GDT base address with junk values (doing it with IDT is useless because it's at a fixed address).
+So Linux decided to "force" them to be ring 3 but with the **CVE-2023-0597** fix by replacing the GDT base address with junk values (doing it with IDT is useless because it's at a fixed address).
 
 For more details read the official patch commit discussion at https://lwn.net/Articles/716461/
 
 ## cea and physical memory
-The cpu_entry_area struct belongs to the per-cpu variable (aka gs segment), which is allocated in physical memory at a predictable address (dependant on memory size and some other details).
+The **cpu_entry_area** struct belongs to the per-cpu variable (aka gs segment), which is allocated in physical memory at a predictable address (dependant on memory size and some other details).
