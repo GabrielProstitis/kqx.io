@@ -26,7 +26,7 @@ Different types of devices exists but we are interested primarly in hard drives 
 ### Internals
 The [eflags](https://wiki.osdev.org/CPU_Registers_x86#EFLAGS_Register) register has a two bit field called **IOPL** (I/O Privilege Level). If the **CPL** (Current Privilege Level) is lower or equals than the thread's **IOPL** then the processor is enabled to interact with the ports. The other way to gain access to I/O ports is to modify **IOPB** or the corresponding bit mask in the [TSS](http://wiki.osdev.org/Task_State_Segment) (to better understand this read the article linked in "Intro").
 
-[aggiungere addr phys predictabile]
+[aggiungere addr phys predictabile]	[nominato in sp0.md, ti basta linkare. -manu]
 [aggiungere dettagli su bitmap TSS]
 
 ## Pwning

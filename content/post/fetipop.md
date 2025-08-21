@@ -81,6 +81,13 @@ popf
 
 Thanks to **@Erge** for finding such path <3
 
+
+## ARM
+Despite the IDT being an x86 specification, thus not present in other architectures such as ARM, the zero_pfn is still a page belonging to the kernel image, which means that we can still hijack some sensible data. <br>
+With a quick check through a debugger we can observe that the page right after the zero_pfn in ARM is the first level of the pagetables that map the kPTI trampoline. <br>
+From here we can make the 4 levels of pagetables overlap on that same page by changing the various entries. This way we need no physical leaks to fake the pagetables. To map the actual code we can overlap the pages once more and write the ring 0 shellcode in the same page as the fake pagetables. <br>
+
+
 ## Lore moment
 fetipop should have been my challenge for [TRXCTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided not to release in order not to leak the technique and give a shot to kctf. <br>
 [Try it out ;)](/attachments/fetipop.zip)
