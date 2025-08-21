@@ -26,6 +26,9 @@ Different types of devices exists but we are interested primarly in hard drives 
 ### Internals
 The [eflags](https://wiki.osdev.org/CPU_Registers_x86#EFLAGS_Register) register has a two bit field called **IOPL** (I/O Privilege Level). If the **CPL** (Current Privilege Level) is lower or equals than the thread's **IOPL** then the processor is enabled to interact with the ports. The other way to gain access to I/O ports is to modify **IOPB** or the corresponding bit mask in the [TSS](http://wiki.osdev.org/Task_State_Segment) (to better understand this read the article linked in "Intro").
 
+[aggiungere addr phys predictabile]
+[aggiungere dettagli su bitmap TSS]
+
 ## Pwning
 ### Primitive
 The primitive is simple: we can modify **IOPL** as we wish. In this case we will set it to 3 so that we can use all I/O ports.
@@ -35,21 +38,39 @@ The objective is to read **flag.txt** possibly without directly interacting with
 Keep in mind that the we are testing out exploits on QEMU and not on an actualy device.
 
 ### Environment setup
-Come abbiamo runnato l'exploit per qemu
+For context, this is how we were running QEMU locally:
+```sh
+#!/bin/sh
+
+qemu-system-x86_64 \
+    -m 3.5G \
+    -no-reboot \
+    -nographic \
+    -cpu host \
+    -smp cores=2 \
+    -kernel bzImage \
+    -initrd initramfs.cpio.gz \
+    -drive file=flag.txt,if=virtio,format=raw,readonly \
+    -append "console=ttyS0 quiet kaslr=on" \
+    -monitor tcp:127.0.0.1:4444,server,nowait \
+    -s
+```
+The kernel's version is **6.14.0** but the exploit is not kernel version or build dependant and it also works with **KVM** enabled.
 
 ### Exploring different paths
-Initially we dumped all the emulated devices from QEMU monitor with `info qtree`
+Initially we dumped all the emulated devices from QEMU monitor with **info qtree**
 
-[screenshot di QEMU]
-
-We tried to interact with the emulated PCI device to read directly the flag but it is not a simple task to do for various reasons: 
+We tried to interact with the emulated **PCI** device to read directly the flag but it is not a simple task to do for various reasons: 
 - this path is device specific (it depends on what type of storage you are using)
 - it's hard to gain privilege escalation
-- it could require MMIO interaction
+- it could require **MMIO** interaction
 
 After waisting our time with the first path, we gave a second look at the list of emulated devices and this particular device caught **@prosti**'s attention...
 
 ### QEMU's fw-cfg emulated device
+![fw-cfg device from QEMU monitor](/images/fw_cfg/fw_cfg_monitor.png)
+As soon as I saw **dma_enabled = true** I started looking for [docs](https://wiki.osdev.org/QEMU_fw_cfg) and obviously OSDev was there for me.
+
 
 ### Using DMA transfers
 Come funziona un DMA transfer con questo device
@@ -58,6 +79,6 @@ Come funziona un DMA transfer con questo device
 Dire che solitamente basta initrd. 
 Come ottenere arb phys write. 
 Link a /dev/mem per brutino.
-Patch `__sys_setuid` oppure shellcode per nsjail escape.
+Patch **__sys_setuid** oppure shellcode per nsjail escape.
 
 ## Exploit

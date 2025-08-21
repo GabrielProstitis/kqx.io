@@ -28,29 +28,30 @@ Little bit of theory about MSRs:
 A model specific register is any of various control registers used for debugging, enabling specific CPU features and performance monitoring.
 Some examples are: EFER used (among other things) to specify if the NX protection or Long Mode are active, or LSTAR in which is contained the virtual address the CPU will jump in kernelspace after executing the syscall instruction.
 
-## Exploitation
+## Pwning
 The first path that comes to mind is overwriting LSTAR to gain kernel RIP hijacking, but there's still a problem: leaks.
 During play-testing this path appeared to be a dead end (curious about unintended solves).
 
-> Exploitation overview
+### Overview
 
 The intended path uses 2 interactions with the driver: one for MSR_SYSCALL_MASK and one for MSR_GS_BASE.
 The idea is to disable SMAP and fake a kernelspace stack in userland which we can use to leak addresses and achieve RIP hijacking
 
-> Exploitation
+### Exploitation
 
 We can disable SMAP for these reasons:
 - the AC bit in EFLAGS can be set in userland
-- during the syscall instruction `RFLAGS := RFLAGS AND NOT(IA32_FMASK)` happens (https://www.felixcloutier.com/x86/syscall)
+- during the syscall instruction **RFLAGS := RFLAGS AND NOT(IA32_FMASK)** happens (https://www.felixcloutier.com/x86/syscall)
 - by modifying MSR_FLAG_MASK we can tell "syscall" to not zero out the AC bit
 
 As said, now the idea is to create a fake GS in userland, but why do we want this? 
-In the `entry_SYSCALL_64` function, which is the first function that gets executed in kernelspace after the syscall instruction, the kernelspace stack gets fetched from an address, which is GS-based. So we can craft a fake GS in userland which: won't result in a kpanic (because of a null-ptr dereference, for example) and will fetch a userland address for the kernelspace RSP.
+In the **entry_SYSCALL_64** function, which is the first function that gets executed in kernelspace after the syscall instruction, the kernelspace stack gets fetched from an address, which is GS-based. So we can craft a fake GS in userland which: won't result in a kpanic (because of a null-ptr dereference, for example) and will fetch a userland address for the kernelspace RSP.
 
 All safe and sound 'till here, the problem is that MSR_GS_BASE is CPU specific, which means that if an hardware context switch happens, the new process that will be run will also use the fake GS, and not the real one, which will, for sure, trigger a kpanic because syscalls needs an actual GS (and for god's sake do not try to fake it all). 
-So we end up in a race where if an hardware context switch happens during the window that starts from the driver's `wrmsr` instruction and ends at the ROPchain execution (where we'll fix GS) a kpanic will be triggered.
+So we end up in a race where if an hardware context switch happens during the window that starts from the driver's **wrmsr** instruction and ends at the ROPchain execution (where we'll fix GS) a kpanic will be triggered.
 Is there a way to make this "race" more reliable? During play-testing we did not find such a way, so this is why CONFIG_HZ is set to 100, given that the default one is 1000, which means that an hardware context swtich happens every 10ms (instead of 1ms) which makes the race 10 times more reliable.
-> Lore moment
+
+### Lore moment
 
 The original kernel image (with CONFIG_HZ=1000) made the exploit unreliable with a success rate of 20-25%. 
 But as soon as my laptop battery would go under the 20% of charge, the exploit would completely stop working, with the only (apparent) fix being plugging in the charger.
@@ -61,7 +62,7 @@ The choice of changing CONFIG_HZ was not made in order to make the challenge act
 
 ![Discord chat](/images/baby_small/ds_chat.png)
 
-> Back to exploitation
+### Back to exploitation
 
 So to win the race I used two processes pinned on two different CPUs and synchronized them through semaphores allocated on shared memory.
 
@@ -80,14 +81,14 @@ The child's tasks are:
 
 
 The ROPchain must:
-- fix GS, to do so you can use an Arbitrary Read gadget (I jumped in the middle of `rep_movs_alternative` which is used in copy_to/from_user) to leak page_offset_base and then add 0x3ea00000 to get the actual GS base (yeah, GS' phys address is predictable)
-- escalate privileges: `commit_creds(&init_cred)`
+- fix GS, to do so you can use an Arbitrary Read gadget (I jumped in the middle of **rep_movs_alternative** which is used in copy_to/from_user) to leak page_offset_base and then add 0x3ea00000 to get the actual GS base (yeah, GS' phys address is predictable)
+- escalate privileges: **commit_creds(&init_cred)**
 - escape container
 	- change shell's namespace
-	- assign a copy of `init_fs` struct to exploit task
+	- assign a copy of **init_fs** struct to exploit task
 - ret2user
 
-Now `system("/bin/sh")` and profit :)
+Now **system("/bin/sh")** and profit :)
 
 ## Full exploit
 ```c

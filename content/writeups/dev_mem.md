@@ -3,22 +3,16 @@ title = '/dev/mem'
 date = 2025-08-20T15:57:29+02:00
 draft = false
 author = 'prosti'
-summary = 'kernel pwn challenge I wrote for TRXCTF 2025'
+summary = 'kernel pwn challenge that I wrote for TRXCTF 2025'
 tags = [
     'linux',
 ]
 toc = true
 +++
 
-## Description
-
-*I have no idea what to put here*
-
-**DISCLAIMER**: Please test your solve locally before spawning a remote instance of the challenge!
-
 ## Author’s Note
 
-The challenge has lot’s of ways to be solved! It was intended for beginner to intermediate kpwn players. The path here explained is pretty straight forward and hopefully you will understand it. 
+The challenge can be solved in lots of different ways! The objective of the challenge is to explore different paths so it should be beginner friendly. The path here explained is pretty straight forward and hopefully you will understand it. 
 
 If you want to share your exploit you can contact me on discord (handle down below!).
 
@@ -108,15 +102,15 @@ int main(int argc, char **argv){
 
 ## Challenge setup
 
-The objective of the challenge was to gain root and read **`/flag.txt`** by interacting with the vulnerable program **`/usr/sbin/chall`** owned by root, only executable by other users and with the setuid flag set (look at **`/init`** for more information). The privileged binary lets the user write 8 bytes per run in a 8 byte aligned physical address by interacting with **`/dev/mem`**.
+The objective of the challenge was to gain root and read **/flag.txt** by interacting with the vulnerable program **/usr/sbin/chall** owned by root, only executable by other users and with the setuid flag set (look at **/init** for more information). The privileged binary lets the user write 8 bytes per run in a 8 byte aligned physical address by interacting with **/dev/mem**.
 
 ### /dev/mem
 
-This character device enables root users to read and write into memory using physical memory addresses. In this case **`CONFIG_STRICT_DEVMEM`** is disabled but **`CONFIG_HARDENED_USERCOPY`** is enabled, this means that you can primarily write in the kernel’s **.data** section. You cannot write into read only mappings because the 16th bit of **`CR0`** (write protect) is enabled.
+This character device enables root users to read and write into memory using physical memory addresses. In this case **CONFIG_STRICT_DEVMEM** is disabled but **CONFIG_HARDENED_USERCOPY** is enabled, this means that you can primarily write in the kernel’s **.data** section. You cannot write into read only mappings because the 16th bit of **CR0** (write protect) is enabled.
 
 ## Exploitation overview
 
-There are many different path to solve the challenge. I’ve personally found a path that unfortunately did not work in the end on the remote instances of the challenge (more information at the end) so in this write-up I will describe **`@Erge`**’s exploit (shout out to him!). The objective is to overwrite the exploit’s **cred** struct and gain root privileges. Be careful! **`CONFIG_STATIC_USERMODEHELPER`** is enabled so you cannot overwrite **`modprobe_path`** to privesc.
+There are many different path to solve the challenge. I’ve personally found a path that unfortunately did not work in the end on the remote instances of the challenge (more information at the end) so in this write-up I will describe **@Erge**’s exploit (shout out to him!). The objective is to overwrite the exploit’s **cred** struct and gain root privileges. Be careful! **CONFIG_STATIC_USERMODEHELPER** is enabled so you cannot overwrite **modprobe_path** to privesc.
 
 We can divide the exploit in a few simple steps:
 
@@ -128,17 +122,17 @@ We can divide the exploit in a few simple steps:
 
 ### Step 1
 
-For the first step some brute force is required. The physical base of the kernel will randomized above the physical address **`CONFIG_PHYSICAL_START`** (0x1000000, look at kernel.config) and it has to be **`CONFIG_PHYSICAL_ALIGN`** (0x200000) bytes aligned. For more information on physical address randomization read [this](https://www.interruptlabs.co.uk/articles/pipe-buffer) article. 
+For the first step some brute force is required. The physical base of the kernel will randomized above the physical address **CONFIG_PHYSICAL_START** (0x1000000, look at kernel.config) and it has to be **CONFIG_PHYSICAL_ALIGN** (0x200000) bytes aligned. For more information on physical address randomization read [this](https://www.interruptlabs.co.uk/articles/pipe-buffer) article. 
 
-To find the base we can just write 8 bytes at every **`CONFIG_PHYSICAL_START` * `CONFIG_PHYSICAL_ALIGN` * `counter` + (`modprobe_path` offset)** address until we overwrite modprobe_path. To check if modprobe_path was actually overwritten, we can just read the value in **`/proc/sys/kernel/modprobe`** after each write. The best way to brute force the address is to start from a high address and go to a lower address. If you try the other way around you will try to overwrite memory in the **.text** or **.rodata** area and cause a kernel panic.
+To find the base we can just write 8 bytes at every **CONFIG_PHYSICAL_START** * **CONFIG_PHYSICAL_ALIGN** * **counter** + (**modprobe_path** offset) address until we overwrite modprobe_path. To check if modprobe_path was actually overwritten, we can just read the value in **/proc/sys/kernel/modprobe** after each write. The best way to brute force the address is to start from a high address and go to a lower address. If you try the other way around you will try to overwrite memory in the **.text** or **.rodata** area and cause a kernel panic.
 
 ### Step 2
 
-Once you locate the physical base of the address you can effectively overwrite any variable in the **.data** section. After a bit of brainstorming I found the perfect variable to overwrite: **`kptr_restrict`**. By setting it to zero we can just read **`/proc/kallsyms`** and read the virtual address of the kernel’s base!
+Once you locate the physical base of the address you can effectively overwrite any variable in the **.data** section. After a bit of brainstorming I found the perfect variable to overwrite: **kptr_restrict**. By setting it to zero we can just read **/proc/kallsyms** and read the virtual address of the kernel’s base!
 
 ### Step 3
 
-At this point `@Erge` found a great vtable to overwrite: `n_**tty_ops**` .
+At this point **@Erge** found a great vtable to overwrite: **n_tty_ops** .
 
 ```c
 static struct tty_ldisc_ops n_tty_ops = {
@@ -160,7 +154,7 @@ static struct tty_ldisc_ops n_tty_ops = {
 };
 ```
 
-By overwriting the pointer to **`n_tty_ops.ioctl`** we gain **rip** control.
+By overwriting the pointer to **n_tty_ops.ioctl** we gain **rip** control.
 
 ### Step 4
 
@@ -178,11 +172,11 @@ mov [rdx], ebx
 ret
 ```
 
-These were found with **[`kropr`](https://github.com/zolutal/kropr)** .
+These were found with [kropr](https://github.com/zolutal/kropr).
 
 ### Step 5
 
-Well at this point, the solution is trivial. We can just traverse the task structures starting from `init_task` and checking, for each iteration, if the task’s `uid` is the same as the exploit’s task!
+Well at this point, the solution is trivial. We can just traverse the task structures starting from **init_task** and checking, for each iteration, if the task’s **uid** is the same as the exploit’s task!
 
 ```c
 struct task_struct {
@@ -409,8 +403,8 @@ int main() {
 
 ## Final notes
 
-If you have any problems understanding the exploit you can contact me on discord (`@.prosti.`).
+If you have any problems understanding the exploit you can contact me on discord (**@.prosti.**).
 
 I will eventually release my initial exploit for the challenge, even if it doesn’t work on the remote servers, as I find it interesting and could help you for future challenges. The first two steps of the exploit are almost the same as this exploit.
 
-Special thanks to `@Erge` for finding this path!
+Special thanks to **@Erge** for finding this path!
