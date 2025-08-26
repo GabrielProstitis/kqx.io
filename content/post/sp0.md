@@ -79,7 +79,7 @@ To this, we can add the IDT at the beginning. <br>
 Whenever a generic ring tries to call an interrupt with a higher DPL (which describes which ring we are switching to through that interrupt), the stack must be changed to a "more privileged" one. When switching to ring **N** (from a lower ring) **SPN** will be assigned as the stack pointer. <br><br>
 *Note*: Given that sp3 is conceptually useless because there are no rings lower than 3, we just have SPs from 0 to 2. In linux ring 1 and 2 are not used, thus the only sp used in linux is actually **SP0**. <br><br>
 SPs are fetched from the TSS. https://elixir.bootlin.com/linux/v6.16/source/arch/x86/include/asm/processor.h#L308 <br>
-This stack is used as a temporary stack to complete the context switch from ring 3 to ring 0, by pushing onto it the userland context onto it as a **pt_regs** struct. <br>
+This stack is used as a temporary stack to complete the context switch from ring 3 to ring 0, by pushing onto it the userland context as a **pt_regs** struct. <br>
 
 ## CVE-2023-0597
 Before linux 6.2, **cpu_entry_area** was not randomized, but rather mapped to a fixed address being **0xfffffe0000001000** (address **0xfffffe0000000000** contains the IDT). <br>

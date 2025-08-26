@@ -168,11 +168,11 @@ To setup the DMA transfer we have to store our **FWCfgDmaAccess** structure at a
 
 After setting up the structure we just have to write its physical address to **FW_CFG_PORT_DMA_{LOW,HIGH}** and that's it! By changing the seek position of a blob of data (let's say initrd because it's big enough to contain all bytes from 0 to 255) we can write an arbitrary byte to an arbitrary physical address.  
 
-At this point we have to find a place to store our **FWCfgDmaAccess** structure. Turns out that finding a fixed physical address with user controlled data is trivial because **[inserire spiegazione]**. 
+At this point we have to find a place to store our **FWCfgDmaAccess** structure. Turns out that finding a fixed physical address with user controlled data is trivial by using **ptregs** and **SP0** as shown in **@leave**'s post
 
 Now with arbitrary physical write we can use the same oracle used to solve the challenge [/dev/mem](https://kqx.io/writeups/dev_mem/) (using **kptr_restrict**) to find the kernel's physical address. At that point we can patch **__sys_setuid** to grant any user root.
 
-Here is the exploit written by **@prosti** (this one doesn't use **ptregs** because it's meant to be a small POC so instead I'm using **/proc/self/pagemap**):
+Here is the exploit written by **@prosti** (this one doesn't use **ptregs** and **SP0** because it's meant to be a small PoC so instead I'm using **/proc/self/pagemap**):
 ```c
 #include "helpers.h"
 #include <sys/io.h>
