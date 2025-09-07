@@ -89,7 +89,7 @@ From here we can make the 4 levels of pagetables overlap on that same page by ch
 
 
 ## Lore moment
-fetipop should have been my challenge for [TRXCTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided not to release in order not to leak the technique and give a shot to kctf. <br>
+fetipop should have been my challenge for [TRX CTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided not to release in order not to leak the technique and give a shot to kctf. <br>
 [Try it out ;)](/attachments/fetipop.zip) and don't hesitate to hit us up to discuss the solve!
 
 **what does the first "p" stand for in fetipop?** <br>

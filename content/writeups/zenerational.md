@@ -1,5 +1,5 @@
 +++
-title = 'zenerational-aura'
+title = 'zenerational-aura - corCTF 2025'
 date = 2025-09-01T02:00:00+02:00
 draft = false
 author = 'leave'

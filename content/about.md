@@ -12,7 +12,7 @@ We are three CTF players that enjoy breaking stuff that have to do with x86, lin
 Alessio Ghidini (**@Erge**):
 * pwner for [TRX](https://theromanxpl0.it/)
 * member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)
-* student @ [unipd] (https://www.unipd.it/)
+* student @ [unipd](https://www.unipd.it/)
 
 Manuele Pandolfi (**@leave**):
 * pwner for [TRX](https://theromanxpl0.it/)

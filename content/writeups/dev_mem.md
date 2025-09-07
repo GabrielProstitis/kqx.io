@@ -1,9 +1,9 @@
 +++
-title = '/dev/mem'
+title = '/dev/mem - TRX CTF 2025'
 date = 2025-08-20T15:57:29+02:00
 draft = false
 author = 'prosti'
-summary = 'kernel pwn challenge that I wrote for TRXCTF 2025'
+summary = 'kernel pwn challenge that I wrote for TRX CTF 2025'
 tags = [
     'linux',
 ]

@@ -1,8 +1,8 @@
 +++
-title = 'FileNo'
+title = 'FileNo - ASIS CTF 2025'
 date = 2025-09-07T13:14:32+02:00
 draft = false
-author = 'leave & Erge'
+author = 'Erge & leave'
 summary = 'kernel pwn challenge authored by ptr_yudai that we first-blooded at ASISctf 2025'
 tags = [
     'linux',
