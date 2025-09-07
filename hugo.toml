@@ -33,6 +33,24 @@ logo = "</>"
 # * Academicons <https://jpswalsh.github.io/academicons> ('ai ai-')
 
 [[params.users]]
+name = "Erge"
+
+  [[params.users.socialLinks]]
+    icon = "fa-brands fa-discord"
+    title = "Discord"
+    url = "erge06"
+
+  [[params.users.socialLinks]]
+    icon = "fa-brands fa-github"
+    title = "GitHub"
+    url = "https://github.com/Lobsterge"
+
+  [[params.users.socialLinks]]	
+    icon = "fa-solid fa-envelope"
+    title = "Email"
+    url = "mailto:erge894@gmail.com"
+
+[[params.users]]
 name = "leave"
 
   [[params.users.socialLinks]]

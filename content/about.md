@@ -7,7 +7,12 @@ social = true
 <br>
 Welcome to kqx!
 <br>
-We are two CTF players that enjoy breaking stuff that have to do with x86, linux and qemu. <br><br>
+We are three CTF players that enjoy breaking stuff that have to do with x86, linux and qemu. <br><br>
+
+Alessio Ghidini (**@Erge**):
+* pwner for [TRX](https://theromanxpl0.it/)
+* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)
+* student @ [unipd] (https://www.unipd.it/)
 
 Manuele Pandolfi (**@leave**):
 * pwner for [TRX](https://theromanxpl0.it/)

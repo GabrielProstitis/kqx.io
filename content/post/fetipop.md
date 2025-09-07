@@ -55,7 +55,7 @@ This way we don't need to control any data region to store a ROPchain, thus not 
 Most of the handlers are meant for handling faults, which doesn't normally happen so corrupting them won't crash anything. The only handlers that get trivially triggered are pagefaults and scheduling-related interrupts.
 
 Through IOP we can build common chains that can lead to arbitrary code execution, an example could be:
-- div by 0 from userland to enter the chain -> offset'd `entry_SYSCALL_64` (kPTI pagetable swap) -> pagefault (on RSP gs-based fetch, given that user gs will be invalid) that throws -> 
+- div by 0 from userland to enter the chain -> offsetted `entry_SYSCALL_64` (kPTI pagetable swap) -> pagefault (on RSP gs-based fetch, given that user gs will be invalid) that throws -> 
 -  double fault (RSP gets overwritten with CR3 so the pagefault handler call fails) -> `entry_SYSRETQ_unsafe_stack`  (swapgs; sysret) -> 
 - general protection fault (sysret requires a canonical return address in RCX, and given that we have full control on registers we can make it fault) -> `set_memory_x` (pass IDT as address to make it executable) ->
 - invalid opcode (because of a check in `cpa_flush` a `BUG_ON` will be called) -> IDT to execute shellcode
@@ -90,7 +90,7 @@ From here we can make the 4 levels of pagetables overlap on that same page by ch
 
 ## Lore moment
 fetipop should have been my challenge for [TRXCTF 2025](https://github.com/TheRomanXpl0it/TRX-CTF-2025) which I decided not to release in order not to leak the technique and give a shot to kctf. <br>
-[Try it out ;)](/attachments/fetipop.zip)
+[Try it out ;)](/attachments/fetipop.zip) and don't hesitate to hit us up to discuss the solve!
 
 **what does the first "p" stand for in fetipop?** <br>
 fetipop is a meme name we came up for the chall after writing it. <br>
