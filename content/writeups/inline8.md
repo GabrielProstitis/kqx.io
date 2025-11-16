@@ -68,7 +68,7 @@ try{
 
 Sweet! The only problem remaining was finding a way to capture the output so that I could use the leak inside my exploit.
 
-This question ironically led me to discover the next functionality I plan to discuss, which also contains the vulnerability i used to exploit the challenge: `console.input()`
+This question ironically led me to discover the next functionality I plan to discuss, which also contains the vulnerability I used to exploit the challenge: `console.input()`
 
 ### The Use-After-Free
 The **console** object in **jsish** is pretty interesting, by looking at the documentation we can find a few unusual methods:
@@ -222,7 +222,7 @@ while(1){} //CRASH!
 console.input("input?\n");
 while(1){} //CRASH!
 ```
-3) It crashes instanly after returning from `console.input()`, since we don't save a reference to the returned string it gets cleaned up immediately by the GC.
+3) It crashes instantly after returning from `console.input()`, since we don't save a reference to the returned string it gets cleaned up immediately by the GC.
 
 As a bonus if we print the UAF-ed string we get a free heap leak since the freed chunk now contains the next pointer in the bins freelist.
 
@@ -237,7 +237,7 @@ We can gain an **Arbitrary Write** primitive by using a standard heap exploitati
 
 ### Constraints
 1) While we can allocate arbitrarily sized data, we cannot use null-bytes.
-2) Jsish treats string as immutable (which is what you'd expect from a proper JS engine but you never know...), therefore we will exploit the UAF by turning into a **Double-Free**
+2) Jsish treats strings as immutable (which is what you'd expect from a proper JS engine but you never know...), therefore we will exploit the UAF by turning into a **Double-Free**
 3) As we can't use null-bytes we're limited to 0x20-sized bins, otherwise we wouldn't be able to allocate a fake next pointer in a bigger chunk
 
 ### Double free
@@ -272,7 +272,7 @@ Now when we first allocate `0x624e37e0c9d0` we can fake a next pointer in the fr
 ### RCE
 The only remaining question is what to overwrite with our primitive, there is no shortage of function pointers on the heap but they sadly all get called with `interp` as their first argument, which is a [struct that represents the internal state of the interpreter](https://github.com/pcmacdon/jsish/blob/master/src/jsiInt.h#L1095), so we could first overwrite the first qword of `interp` with `/bin/sh` and then overwrite a function pointer to `system@plt`.
 
-Luckily the `interp` struct itself contains some function pointers so we can save ourself an extra write!
+Luckily the `interp` struct itself contains some function pointers so we can save ourselves an extra write!
 
 We will first target the 0x90-sized bins entry of the `tcache_struct` to increase the size of our arbitrary write, and then overwrite `interp->sig` with `/bin/sh` and `interp->debugOpts.hook` with `system@plt`.
 
