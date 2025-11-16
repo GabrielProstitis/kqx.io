@@ -6,13 +6,12 @@ author = 'Erge'
 summary = 'Exploiting a pretty broken JS-engine'
 tags = [
     'JS-Engine'
-    'heap'
 ]
 toc = true
 +++
 
 ## Premise
-This is a writeup for a challenge I encountered at [DefCamp DCTF Finals 2025](https://def.camp/competitions/defcamp-capture-the-flag-d-ctf-at-the-hacking-village/), an onsite CTF I played with [TRX](https://theromanxpl0.it/), and while I didn't finish my exploit on time during the CTF I thought it would be interesting to explain my approach, as it ended up being pretty different from the [Author's solution](https://blog.mcsky.ro/writeups/2025/11/15/inline8-writeup.html).
+This is a writeup for a challenge I encountered at [DefCamp DCTF Finals 2025](https://def.camp/competitions/defcamp-capture-the-flag-d-ctf-at-the-hacking-village/), an onsite CTF I played with [TRX](https://theromanxpl0.it/), and while I didn't finish my exploit on time during the CTF, I thought it would be interesting to explain my approach, as it ended up being pretty different from the [Author's solution](https://blog.mcsky.ro/writeups/2025/11/15/inline8-writeup.html).
 
 ## Challenge Overview
 The challenge tasks us to exploit a custom JS interpreter called **"jsish"**, patched in order to remove some functionalities that would trivialize gaining code execution.
@@ -54,7 +53,7 @@ console.log(File.read("/flag-RANDOM-NONCE.txt"));
 Giving us the flag and the revenge version of this challenge :)
 
 ### The Leak
-After the revenge got released I started looking for low-hanging fruit ways of leaking addresses, which led me to `import("/proc/self/maps");` which when parsed by interpreter leaks the base address of the **jsish** binary.
+After the revenge got released (which removed File alongside a few other things) I started looking for low-hanging fruit ways of leaking addresses, which led me to `import("/proc/self/maps");` which when parsed by interpreter leaks the base address of the **jsish** binary.
 
 ```js
 try{
@@ -74,8 +73,8 @@ This question ironically led me to discover the next functionality I plan to dis
 ### The Use-After-Free
 The **console** object in **jsish** is pretty interesting, by looking at the documentation we can find a few unusual methods:
 
-![console_doc]((/images/inline8/console_doc.png))
-(Printf is not vulnerable sadly 😢)
+![console_doc](/images/inline8/console_doc.png)
+(Printf is not vulnerable sadly 🥀)
 
 I was pretty interested in the `console.input()` function because 
 1) User input is always a red flag. 
@@ -127,7 +126,7 @@ j.js:6:   "Ĩ��\0free(): double free detected in tcache 2
 Aborted (core dumped)
 ```
 
-![thinking](images/inline8/thinking.png)
+![thinking](/images/inline8/thinking.png)
 
 You're probably as confused as I was so let's skip to the chase and analyze the source code for the `console.input()` function:
 
@@ -209,32 +208,39 @@ We can confirm our suspicions with a few tests:
 var input = console.input("input?\n");
 while(1){} //NO CRASH!
 ```
+1) The string object is never cleaned up so we don't trigger a crash.
+
+
 ```js
 var input = console.input("input?\n");
 delete input;
 while(1){} //CRASH!
 ```
+2) It crashes when we explicitly delete the object.
 
 ```js
 console.input("input?\n");
 while(1){} //CRASH!
 ```
-
-1) The string object is never cleaned up so we don't trigger a crash.
-2) It crashes when we explicitly delete the object.
 3) It crashes instanly after returning from `console.input()`, since we don't save a reference to the returned string it gets cleaned up immediately by the GC.
 
 As a bonus if we print the UAF-ed string we get a free heap leak since the freed chunk now contains the next pointer in the bins freelist.
 
-### The exploit
-Now that we have both PIE and heap leaks, a way to allocate arbitrary data with `console.input()`, free said data using the `delete` operator and our UAF vulnerability we can gain an **Arbitrary Write** primitive by using a standard heap exploitation technique, [Fastbin Dup](https://github.com/shellphish/how2heap/blob/master/glibc_2.35/fastbin_dup.c), which i found to be the easiest to weaponize given our constraints.
+## The exploit
+Now that we have:
+- Both PIE and heap leaks
+- A way to allocate arbitrary data with `console.input()` 
+- Free said data using the `delete` operator 
+- Our UAF vulnerability
 
-## Constraints
+We can gain an **Arbitrary Write** primitive by using a standard heap exploitation technique, [Fastbin Dup](https://github.com/shellphish/how2heap/blob/master/glibc_2.35/fastbin_dup.c), which i found to be the easiest to weaponize given our constraints.
+
+### Constraints
 1) While we can allocate arbitrarily sized data, we cannot use null-bytes.
 2) Jsish treats string as immutable (which is what you'd expect from a proper JS engine but you never know...), therefore we will exploit the UAF by turning into a **Double-Free**
 3) As we can't use null-bytes we're limited to 0x20-sized bins, otherwise we wouldn't be able to allocate a fake next pointer in a bigger chunk
 
-## Double free
+### Double free
 ```js
 var x = "prompt!";
 var uaf = console.input(x);
@@ -263,7 +269,7 @@ fastbins
 
 Now when we first allocate `0x624e37e0c9d0` we can fake a next pointer in the freelist, allowing us to allocate a chunk wherever we desire, giving us our **Arbitrary Write** primitive!. 
 
-## RCE
+### RCE
 The only remaining question is what to overwrite with our primitive, there is no shortage of function pointers on the heap but they sadly all get called with `interp` as their first argument, which is a [struct that represents the internal state of the interpreter](https://github.com/pcmacdon/jsish/blob/master/src/jsiInt.h#L1095), so we could first overwrite the first qword of `interp` with `/bin/sh` and then overwrite a function pointer to `system@plt`.
 
 Luckily the `interp` struct itself contains some function pointers so we can save ourself an extra write!
@@ -273,7 +279,7 @@ We will first target the 0x90-sized bins entry of the `tcache_struct` to increas
 Which will cause the interpreter to call `system("/bin/sh")` in the next eval loop, giving us the shell we worked hard for 😄. 
 
 
-### Exploit code
+## Exploit code
 **x.js**:
 ```js
 try{
