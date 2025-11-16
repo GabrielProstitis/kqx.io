@@ -2,7 +2,7 @@
 title = '{{ replace .File.ContentBaseName "-" " " | title }}'
 date = {{ .Date }}
 draft = false
-author = 'leave & prosti'
+author = 'Erge & leave & prosti'
 summary = 'summary'
 tags = [
     'example1',
