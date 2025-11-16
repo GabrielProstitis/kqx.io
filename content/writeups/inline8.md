@@ -126,7 +126,7 @@ j.js:6:   "Ĩ��\0free(): double free detected in tcache 2
 Aborted (core dumped)
 ```
 
-![thinking](/images/inline8/thinking.png)
+![thinking](/images/inline8/thinking.jpg)
 
 You're probably as confused as I was so let's skip to the chase and analyze the source code for the `console.input()` function:
 
