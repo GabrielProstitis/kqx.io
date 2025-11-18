@@ -83,7 +83,7 @@ As you can see, we have a kASLR leak in R11.
 ## Exploit
 The idea is to fake a `seq_file` struct in order to control the vtable. <br>
 The easiest way would be placing both the struct and the ROPchain on the heap, but obtaining user controlled data in a cache at a constant offset from the `seq_file` cache leak is unreliable. <br>
-Instead, we opted to fake the `seq_file` struct in **cpu_entry_area** (CEA) (in QEMU a leak is not needed, check out our blogpost: https://kqx.io/post/sp0). <br>
+Instead, we opted to fake the `seq_file` struct in **cpu_entry_area** (CEA) (in QEMU a leak is not needed, check out our blogpost: https://kqx.io/post/sp0\). <br>
 Thanks to the fake `seq_file` we can control the vtable and get RIP hijacking. <br>
 
 Ideally we would then pivot the stack to a region with user controlled data, and luckily at [call-time](https://elixir.bootlin.com/linux/v6.12.4/source/fs/seq_file.c#L225) RDI points at our fake `seq_file` struct and **@Erge** found an incredible gadget to perform a `mov rsp, rdi; ret` like operation: <br>
