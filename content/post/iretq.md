@@ -1,9 +1,9 @@
 +++
 title = 'Bloodding kernel challs'
-date = 2025-11-18T20:10:29+01:00
+date = 2025-12-08T13:00:00+01:00
 draft = false
 author = 'prosti, leave, Erge'
-summary = 'Bloodding kernel pwn challenges with a QEMU nday'
+summary = 'Bloodding kernel pwn challenges with a nday on QEMU'
 tags = [
     'QEMU',
     'x86'
@@ -11,28 +11,28 @@ tags = [
 toc = true
 +++
 
-## pwning QEMU
+# pwning QEMU
 
 ## The vulnerability
-I’ll get straight to the point: `iret` and `call far` are broken in all versions of QEMU prior to version **9.1**. The implementation of these instructions in QEMU's [TCG](https://wiki.qemu.org/Documentation/TCG) do not behave as intended.
+I’ll get straight to the point: **iret** and **call far** are broken in all versions of QEMU prior to version **9.1**. The implementation of these instructions in QEMU's [TCG](https://wiki.qemu.org/Documentation/TCG) do not behave as intended.
 
-`iretq` is used when returning from an interrupt and pretty much pops from the stack these registers (in order):
-- `rip`
-- `cs`
-- `eflags`
-- `rsp`
-- `ss`
+**iretq** is used when returning from an interrupt and pretty much pops from the stack these registers (in order):
+- **rip**
+- **cs**
+- **eflags**
+- **rsp**
+- **ss**
 
-`call far` is used to change the instruction pointer, change the value of `cs`, and push the saved `rip` and `cs` on the stack.
+**call far** is used to change the instruction pointer, change the value of **cs**, and push the saved **rip** and **cs** on the stack.
 
-The assumption made by QEMU developers is that these instructions (especially `iret`) were going to be used from ring 0 to go to ring 3 or to ring 0. This assumption is violated when `iret` is used to stay in ring 3 and just setting new values for `cs` and `ss`. Based on this, QEMU automatically accesses the stack as if the *current privilege level is 0* even if you are currently in ring 3.
+The assumption made by QEMU developers is that these instructions (especially **iret**) were going to be used from ring 0 to go to ring 3 or to ring 0. This assumption is violated when **iret** is used to stay in ring 3 and just setting new values for **cs** and **ss**. Based on this, QEMU automatically accesses the stack as if the *current privilege level is 0* even if you are currently in ring 3.
 
 ## Arbitrary write
-The first primitive that we gained was **arbitrary write**. By using `far call` and changing right before the call `rsp` to the address of an arbitrary writable kernel page, we can write the address of the call instruction in the specified address. <br>
-Since we can control at least the value of the last byte of the address of the `far call` instruction, we can write one arbitrary byte at a time. <br>
-If `KASLR` is on we need leaks (more on that later) and if `kPTI` is on we are (for now) kind of screwed because kernel pages are not mapped (kind of, continue reading to find out how we exploited the arbw primitive with `KPTI` on).
+The first primitive that we gained was **arbitrary write**. By using **far call** and changing right before the call **rsp** to the address of an arbitrary writable kernel page, we can write the address of the call instruction in the specified address. <br>
+Since we can control at least the value of the last byte of the address of the **far call** instruction, we can write one arbitrary byte at a time. <br>
+If **KASLR** is on we need leaks (more on that later) and if **kPTI** is on we are (for now) kind of screwed because kernel pages are not mapped (kind of, continue reading to find out how we exploited the arbw primitive with **KPTI** on).
 
-### Full arb W (no KPTI)
+### ARBW exploit (KPTI off)
 Here is the code and shellcode that you need for arbw:
 
 ```asm
@@ -99,20 +99,20 @@ The second primitive is a bit weird. While I was working on the arbitrary write 
 ## Bypassing KASLR
 
 Given that the primitive lets us access kernel memory from userspace, we can read an address that ideally contains a leak of kbase in order to bypass KASLR. There are two main problems:
-- finding a section of memory that contains a pointer to the kernel .text in the user page table (we're assuming `kPTI` is on);
+- finding a section of memory that contains a pointer to the kernel .text in the user page table (we're assuming **kPTI** is on);
 - how do we find out the address for the said section.
 
 ### Exception handling
-When a fault in userland occurs, `RIP` control is passed to the kernel, which is still running on the user page table, thus it needs a shared stack to perform the context switch. <br>
-Functions are called, so return addresses are pushed onto the stack, in particular we are going to target the `asm_exc_*_error` handler (for simplicity, we will trigger a div by 0 error), for a simple reason: that specific return address is pushed right after the context, which means we control the qwords stored "underneath" the leak. <br> 
-We could both use `retf` or `iret`, we will choose `iret` so we don't need to set up a valid userland stack for the handler later.
+When a fault in userland occurs, **RIP** control is passed to the kernel, which is still running on the user page table, thus it needs a shared stack to perform the context switch. <br>
+Functions are called, so return addresses are pushed onto the stack, in particular we are going to target the **asm_exc_*_error** handler (for simplicity, we will trigger a div by 0 error), for a simple reason: that specific return address is pushed right after the context, which means we control the qwords stored "underneath" the leak. <br> 
+We could both use **retf** or **iret**, we will choose **iret** so we don't need to set up a valid userland stack for the handler later.
 So the steps are:
-- set up the shared stack to have a valid `iret` frame;
-- make `RSP` point to that address;
-- `iret`;
-- handle the page fault and read `RIP`, which, as said, will contain the leak.
+- set up the shared stack to have a valid **iret** frame;
+- make **RSP** point to that address;
+- **iret**;
+- handle the page fault and read **RIP**, which, as said, will contain the leak.
 
-First step is accomplished by triggering a fault and handling it: the easiest way is declaring a `SIGFPE` handler and trigger a div by 0. By setting up `R15 ... R12` before the `DIV` those values will be pushed right before the leak, permitting us to push a valid `iret` frame.
+First step is accomplished by triggering a fault and handling it: the easiest way is declaring a **SIGFPE** handler and trigger a div by 0. By setting up **R15 ... R12** before the **DIV** those values will be pushed right before the leak, permitting us to push a valid **iret** frame.
 
 ```asm
 mov r15, 0x33
@@ -124,7 +124,7 @@ div rax
 ```
 
 We now need to "leak" the address of the shared stack. <br>
-The shared stack is core dependent, just like `TSS` and `GDT`, whose addresses are randomized and isolated from kbase: the reasons why they are isolated is `sgdt`, a ring 3 instruction [(by default)](https://en.wikipedia.org/wiki/X86_instruction_listings#cite_note-13) which return to the user the `GDT` address. By adding the right offset (0x1000) we can get the shared stack address, and by adding again the right offset (0xf50) we will get the exact address where the fake `iret` is stored. There are actually some more things about this, you can read more in another blogpost of ours: https://kqx.io/post/sp0.
+The shared stack is core dependent, just like **TSS** and **GDT**, whose addresses are randomized and isolated from kbase: the reasons why they are isolated is **sgdt**, a ring 3 instruction [(by default)](https://en.wikipedia.org/wiki/X86_instruction_listings#cite_note-13) which return to the user the **GDT** address. By adding the right offset (0x1000) we can get the shared stack address, and by adding again the right offset (0xf50) we will get the exact address where the fake **iret** is stored. There are actually some more things about this, you can read more in another blogpost of ours: https://kqx.io/post/sp0.
 
 ```asm
 push rax
@@ -133,7 +133,7 @@ mov rax, qword [rsp+2]
 add rax, 0x1f50
 mov rsp, rax
 ```
-Now we can simply `iret` there and the leak will be readable from userspace.
+Now we can simply **iret** there and the leak will be readable from userspace.
 
 Full shellcode:
 
@@ -155,8 +155,8 @@ mov rsp, rax
 iretq
 ```
 
-### Full leak
-Full leak exploit that doesn't depend on the kernel image and works with `kPTI` on:
+### leak exploit
+Full leak exploit that doesn't depend on the kernel image and works with **kPTI** on:
 ```c
 #include  "helpers.h"
 #include  <sys/syscall.h>
@@ -227,9 +227,9 @@ int main() {
 }
 ```
 
-## Full exploit (no kPTI)
-Here is full working exploit with `kPTI` off on **QEMU v8.2**. <br>
-(This is the exploit we used at n1ctf 2025 to blood the challenge `n1khash`)
+## Full exploit (kPTI off)
+Here is full working exploit with **kPTI** off on **QEMU v8.2**. <br>
+(This is the exploit we used at n1ctf 2025 to blood the challenge **n1khash**)
 
 ```c
 #define DBG
@@ -316,7 +316,7 @@ int main() {
 }
 ```
 
-### That damn physmap leak...
+## That damn physmap leak...
 At this point we were stuck for a few months with an exploit that worked only with **kPTI** off. What can we do with the few kernel mappings that are mapped in the user page table?
 
 Let's have a look to what is mapped in userland:
@@ -336,7 +336,7 @@ TL;DR: we can overwrite the **iomap_base** field of the TSS in order to gain ful
 
 What is stopping us from relying on this path to exploit this vulnerability? Well, physmap is randomized, and we weren't able to leak its base. <br>
 
-## Further works
+## Exploiting with kPTI on
 In response to the challenge we posted on X, **@cscat** found some interesting paths: <br>
 
 ### Arbitrary Read
@@ -348,7 +348,7 @@ Another idea he gave us was to exploit the arbitrary write on a core to write ma
 Not every CTF challenge runs on two cores, so we aimed for a more universal idea with one last bit of information **@cscat** gave us. <br>
 
 ### HWBP ftw
-As I said the only missing bit is a physmap leak, what **@leave** tried was to exploit `copy_to/from_user` with an invalid userland mapping to trigger a fault and push on the stack (used by the page fault handler) the current context. <br>
+As I said the only missing bit is a physmap leak, what **@leave** tried was to exploit **copy_to/from_user** with an invalid userland mapping to trigger a fault and push on the stack (used by the page fault handler) the current context. <br>
 The idea is to build a fake **iretq** frame with the registers **rdi**, **rsi**, **rdx**/**rcx**, because rdx and rcx will contain the size asked (so user-controlled), and rdx/rcx the arbitrary user mapping (so user-controlled) and a physmap leak (if you interact with a pipe for example). <br>
 The only problem is that "trivial" faults that happens in kernelspace DO NOT switch the stack, so the context doesn't get saved in the CEA region. <br>
 The special exceptions that fetch stacks from the IST have some special bits set inside the IDT. <br>
@@ -358,8 +358,8 @@ So **@cscat** shared with us this [blogpost](https://googleprojectzero.blogspot.
 The way **@leave** took advantage of this was to simply put physmap leaks in the debug exception stack by setting the HWBP on a userland address that is accessed via a pipe interaction. So we'll find the address of the pipe's buffer in CEA. <br>
 Then we can use the arbitrary read primitive found by **@cscat** and get the physmap leak. <br>
 
-### kPTI=on exploit
-The only scenario where this exploit does not work is in a jail hardened with seccomp where `ptrace` is banned. <br>
+### Full exploit (kPTI on)
+The only scenario where this exploit does not work is in a jail hardened with **seccomp** where **ptrace** is banned. <br>
 
 ```c
 #define _GNU_SOURCE
