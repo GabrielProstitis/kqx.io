@@ -1,9 +1,9 @@
 +++
-title = 'Bloodding kernel challs'
+title = 'Exploiting a 13-years old bug on QEMU'
 date = 2025-12-08T13:00:00+01:00
 draft = false
 author = 'prosti, leave, Erge'
-summary = 'Bloodding kernel pwn challenges with a nday on QEMU'
+summary = 'Learn how to cheese kpwn challenges running on a Ubuntu 24.04 container using a nday on QEMU'
 tags = [
     'QEMU',
     'x86'
