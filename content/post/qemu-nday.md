@@ -11,8 +11,6 @@ tags = [
 toc = true
 +++
 
-# pwning QEMU
-
 ## The vulnerability
 I’ll get straight to the point: **iret** and **call far** are broken in all versions of QEMU prior to version **9.1**. The implementation of these instructions in QEMU's [TCG](https://wiki.qemu.org/Documentation/TCG) do not behave as intended.
 
