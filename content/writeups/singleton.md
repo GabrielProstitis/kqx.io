@@ -1,7 +1,7 @@
 +++
 title = 'Singleton - ASIS CTF Finals 2025'
 date = 2025-12-30T12:41:03+01:00
-draft = true
+draft = false
 author = 'Erge'
 summary = 'Colliding hashes and confusing types for fun and profit'
 tags = [
@@ -43,7 +43,7 @@ dcheck_always_on = false
 use_siso = false
 ```
 
-Our goal is to gain **RCE** and execute the **/flag_reader** binary and since the v8 heap sandbox is disabled obtaining the **addrOf** and **fakeObj** primitives will be enough to solve the challenge.
+Our goal is to gain **RCE** and execute the **/flag_reader** binary and since the V8 heap sandbox is disabled obtaining the **addrOf** and **fakeObj** primitives will be enough to solve the challenge.
 
 ## Analyzing the patch
 Let's look at the provided diff from a wider angle, the patch modifies `TypeCanonicalizer::CanonicalEquality::EqualTypeIndex()`:
@@ -71,7 +71,7 @@ This sounds like textbook type confusion!
 ## The (failed) type confusion
 (I'll be using **wasm-module-builder.js** to build the exploit modules, you can find it in the [V8 repo](https://github.com/v8/v8/blob/main/test/mjsunit/wasm/wasm-module-builder.js))
 
-The first thing i tried was a very naive type confusion:
+The first thing I tried was a very naive type confusion:
 
 ```js
 d8.file.execute("./wasm-module-builder.js");
@@ -92,7 +92,7 @@ let struct_i64 = builder.addStruct([makeField(wasmRefType(i64_holder), true)]);
 ```
 
 These structs are functionally identical, however they have two different type indexes as their field (because they refer to our previous structs). <br> 
-Due to the patch V8 thinks they are referring to the same type, and thus it should theoretically allows us to freely cast one instance of the struct to the other.
+Due to the patch V8 thinks they are referring to the same type, and thus it should theoretically allow us to freely cast one instance of the struct to the other.
 
 Let's put this theory to the test:
 ```js
@@ -174,7 +174,7 @@ different struct types into the same canonical index and cause arbitrary
 Wasm type confusion.
 ```
 
-And that is what we will implement, sadly this is the part where I ran out of time during the CTF, so the following implemention isn't at all optmized or well-thought-out, but at least it worked :p
+And that is what we will implement. Sadly this is the part where I ran out of time during the CTF, so the following implemention isn't at all optmized or well-thought-out, but at least it worked :p
 
 My (lazy) approach was directly patching the V8 source code and hooking the `CanonicalSingletonGroup::hash_value()` function:
 ```diff
@@ -317,7 +317,7 @@ for (const coll of colls) {
 }
 ```
 
-After running for a while (in a VPS with lots of RAM 🥀) we finally get our collisions:
+After running for a while (in a VPS with lots of RAM 🥀) we finally got our collisions:
 
 ```bash
 [+] collision found
@@ -345,7 +345,7 @@ Whose 7th element differs!
 We now have all we need for our type confusion :D
 
 ## The (successful) type confusion
-We just need to modify our previous exploit to use the structs we found, this time V8 will allows us to freely cast the structs resulting in our **addrOf** and **fakeObj** primitives
+We just need to modify our previous exploit to use the structs we found, this time V8 will allow us to freely cast the structs resulting in our **addrOf** and **fakeObj** primitives
 ```js
 d8.file.execute("./wasm-module-builder.js");
 
