@@ -1,5 +1,5 @@
 +++
-title = '/dev/mem - TRX CTF 2025'
+title = '/dev/mem - TRXCTF 2025'
 date = 2025-08-20T15:57:29+02:00
 draft = false
 author = 'prosti'

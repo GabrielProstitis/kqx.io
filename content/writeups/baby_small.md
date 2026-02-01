@@ -1,5 +1,5 @@
 +++
-title = '🍼🤏 - TRX CTF 2025'
+title = '🍼🤏 - TRXCTF 2025'
 date = 2025-08-20T15:39:48+02:00
 draft = false
 author = 'leave'

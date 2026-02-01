@@ -7,19 +7,11 @@ social = true
 <br>
 Welcome to kqx!
 <br>
-We are three CTF players that enjoy breaking stuff that have to do with x86, linux and qemu. <br><br>
 
-Alessio Ghidini (**@Erge**):
-* pwner for [TRX](https://theromanxpl0.it/)
-* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)
-* student @ [unipd](https://www.unipd.it/)
+We are three CTF players that enjoy breaking stuff that have to do with **kernels**, **QEMU**, **x86** and **browsers**!. <br>
 
-Manuele Pandolfi (**@leave**):
-* pwner for [TRX](https://theromanxpl0.it/)
-* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2025)
-* student @ jk still a kiddo, when I'll start uni I'll let you know
+Alessio Ghidini (**@Erge**):<br>* pwner for [TRX](https://theromanxpl0.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)<br>* student @ [unipd](https://www.unipd.it/)
 
-Gabriel Prostitis (**@prosti**):
-* pwner for [TRX](https://theromanxpl0.it/) and [ToH](https://towerofhanoi.it/)
-* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)
-* student @ [polimi](https://www.polimi.it/)
+Manuele Pandolfi (**@leave**):<br>* pwner for [TRX](https://theromanxpl0.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2025)<br>* student @ jk still a kiddo, when I'll start uni I'll let you know
+
+Gabriel Prostitis (**@prosti**):<br>* pwner for [TRX](https://theromanxpl0.it/) and [ToH](https://towerofhanoi.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)<br>* student @ [polimi](https://www.polimi.it/)

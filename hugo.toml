@@ -1,7 +1,7 @@
 baseURL = 'http://kqx.io'
 theme = 'risotto'
 title = "kqx"
-author = 'leave & prosti'
+author = 'Erge, leave, prosti'
 languageCode = 'en-us'
 DefaultContentLanguage = "en"
 enableInlineShortcodes = true
@@ -31,6 +31,19 @@ logo = "</>"
 # Available icon sets:
 # * FontAwesome 6 <https://fontawesome.com/> ('fa-brands', 'fa-normal', or 'fa-solid' for brands)
 # * Academicons <https://jpswalsh.github.io/academicons> ('ai ai-')
+
+[[params.users]]
+name = "kqx"
+
+  [[params.users.socialLinks]]
+    icon = "fa-brands fa-x-twitter"
+    title = "X"
+    url = "https://x.com/kqx_io"
+
+  [[params.users.socialLinks]]	
+    icon = "fa-solid fa-envelope"
+    title = "Email"
+    url = "mailto:blog.kqx.io@gmail.com"
 
 [[params.users]]
 name = "Erge"
