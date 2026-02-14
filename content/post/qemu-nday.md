@@ -6,7 +6,8 @@ author = 'prosti, leave, Erge'
 summary = 'Learn how to cheese kpwn challenges running on a Ubuntu 24.04 container using a nday on QEMU'
 tags = [
     'QEMU',
-    'x86'
+    'x86',
+    'TCG'
 ]
 toc = true
 +++
@@ -681,4 +682,6 @@ Keep in mind that the default version shipped with Ubuntu 24.04 TLS is still vul
 
 ## Lore
 This is an actual fortune cookie quote **@prosti** found the same night he discovered the vulnerability:
+<br>
+<br>
 ![cookie](/images/qemu/cookie.png)
