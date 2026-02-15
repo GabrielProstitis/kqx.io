@@ -25,7 +25,7 @@ palette = "base16-dark"
 [params.about]
   title = "kqx"
   description = "kernel pwn and browser exploitation"
-  logo_image = "content/images/banner.jpg"
+  logo_image = "/images/banner.jpg"
 
 # Sidebar: social links
 # Available icon sets:
