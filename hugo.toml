@@ -23,9 +23,9 @@ palette = "base16-dark"
 
 # Sidebar: about/bio
 [params.about]
-title = "kqx"
-# unicode/emoji logo:
-logo = "</>"
+  title = "kqx"
+  description = "kernel pwn and browser exploitation"
+  logo_image = "content/images/banner.jpg"
 
 # Sidebar: social links
 # Available icon sets:
@@ -113,15 +113,18 @@ name = "prosti"
 
   [[menu.main]]
     identifier = "about"
-    name = "About"
+    name = "about"
     url = "/about/"
-    weight = 10
 
-	[[menu.main]]
+  [[menu.main]]
+    identifier = "post"
+    name = "posts"
+    url = "/post/"
+  
+  [[menu.main]]
     identifier = "writeups"
-    name = "Writeups"
+    name = "writeups"
     url = "/writeups/"
-    weight = 0
 
 [taxonomies]
 category = "categories"

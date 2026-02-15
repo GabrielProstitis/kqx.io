@@ -1,5 +1,5 @@
 +++
-title = 'krwx'
+title = 'krwx - ToHCTF 2025'
 date = 2025-07-29T22:30:31+02:00
 draft = false
 author = 'prosti'

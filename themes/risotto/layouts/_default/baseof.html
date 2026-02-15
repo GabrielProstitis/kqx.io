@@ -22,13 +22,13 @@
                         {{- block "aside" . }}{{- end }}
                     </div>
                 </section>
+            {{else}}
+                <section class="page__about">
+                    <div>
+                        {{- block "about" . }}{{- end }}
+                    </div>
+                </section>
             {{end}}
-
-            <section class="page__about">
-                <div>
-                    {{- block "about" . }}{{- end }}
-                </div>
-            </section>
 
 
             <footer class="page__footer">

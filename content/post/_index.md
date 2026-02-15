@@ -1,5 +1,4 @@
 +++
-aliases = ["post", "articles", "blog", "showcase", "docs"]
-title = "Posts"
-author = "leave & prosti"
+title = "posts"
+summary = "Our findings in the linux kernel, QEMU and browsers."
 +++

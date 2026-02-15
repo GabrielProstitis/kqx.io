@@ -1,5 +1,9 @@
 {{ define "main" }}
-    <h1>posts</h1><br>
+    <header>
+        <h1>{{ .Title | markdownify }}</h1>
+    </header>
+
+    <br>
     {{ range .Pages }}
     <article class="post">
         <header class="post__header">
@@ -18,4 +22,5 @@
         
     </article>
     {{ end }}
+    
 {{ end }}

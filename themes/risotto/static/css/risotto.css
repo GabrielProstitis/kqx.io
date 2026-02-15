@@ -1,12 +1,9 @@
 @import 'colours.css';
 @import 'typography.css';
-@import 'layout.css';
 @import 'header.css';
 @import 'logo.css';
-@import 'about.css';
 @import 'footer.css';
 
-body {
-    background-color: var(--bg);
-    color: var(--fg);
-}
+@import 'custom/page.css';
+@import 'custom/post.css';
+@import 'custom/about.css';

@@ -1,11 +1,11 @@
 {{ define "main" }}
-    <header class="content__header">
+    <header>
         <h1>{{ .Title | markdownify }}</h1>
     </header>
-    <div class="content__body">
+
+    <div>
         {{ .Content }}
     </div>
-    <footer class="content__footer"></footer>
 {{ end }}
 
 {{define "aside" }}
@@ -20,7 +20,7 @@
     {{ if and (.Params.toc) (.TableOfContents) }}
         <hr>
         On this page:
-        <section class="post__toc">
+        <section>
             {{ .TableOfContents }}
         </section>
     {{ end }}
@@ -28,48 +28,45 @@
 {{ end }}
 
 {{define "about" }}
-    {{if .Params.social}}
-        <section class="about">
-            <i>"We fear no undocumented behaviour"</i>
-        
-            {{ range $user := .Site.Params.users }}
-                <section class="about__social-links">   
-                    <strong>@{{$user.name}}</strong> 
-                    
-                    <section class="about__social-icons">
-                        {{ range $link := $user.socialLinks}}
-							{{ if eq $link.title "Discord" }}
-								<div id="copyBubble" class="copy-bubble">Copied!</div>
+    <section class="about">
+        <i>"We fear no undocumented behaviour"</i>
+    
+        {{ range $user := .Site.Params.users }}
+            <section class="about__social-links">   
+                <strong>@{{$user.name}}</strong> 
+                
+                <section class="about__social-icons">
+                    {{ range $link := $user.socialLinks}}
+                        {{ if eq $link.title "Discord" }}
+                            <div id="copyBubble" class="copy-bubble">Copied!</div>
 
-								<script>
-									function showCopyBubble(el) {
-										let bubble = el.querySelector('.copy-bubble');
-										if (!bubble) {
-											bubble = document.createElement('div');
-											bubble.className = 'copy-bubble';
-											bubble.textContent = 'Copied!';
-											el.appendChild(bubble);
-										}
-										bubble.style.opacity = 1;
-										bubble.style.transform = 'translateY(23px)';
-										setTimeout(() => {
-											bubble.style.opacity = 0;
-											bubble.style.transform = 'translateY(10px)';
-										}, 700);
-									}
-								</script>
+                            <script>
+                                function showCopyBubble(el) {
+                                    let bubble = el.querySelector('.copy-bubble');
+                                    if (!bubble) {
+                                        bubble = document.createElement('div');
+                                        bubble.className = 'copy-bubble';
+                                        bubble.textContent = 'Copied!';
+                                        el.appendChild(bubble);
+                                    }
+                                    bubble.style.opacity = 1;
+                                    bubble.style.transform = 'translateY(23px)';
+                                    setTimeout(() => {
+                                        bubble.style.opacity = 0;
+                                        bubble.style.transform = 'translateY(10px)';
+                                    }, 700);
+                                }
+                            </script>
 
-								<a aria-label="{{ $link.title }}" title="{{ $link.title }}" onclick="navigator.clipboard.writeText('{{ $link.url }}').then(()=>showCopyBubble(this.parentNode))"><i class="{{ $link.icon }}"></i></a>&nbsp;
-							{{else}}
-                            	<a href="{{ $link.url }}" rel="me" aria-label="{{ $link.title }}" title="{{ $link.title }}"><i class="{{ $link.icon }}"></i></a>&nbsp;
-							{{end}}
-						{{end}}
-                    </section>
-                    
+                            <a aria-label="{{ $link.title }}" title="{{ $link.title }}" onclick="navigator.clipboard.writeText('{{ $link.url }}').then(()=>showCopyBubble(this.parentNode))"><i class="{{ $link.icon }}"></i></a>&nbsp;
+                        {{else}}
+                            <a href="{{ $link.url }}" rel="me" aria-label="{{ $link.title }}" title="{{ $link.title }}"><i class="{{ $link.icon }}"></i></a>&nbsp;
+                        {{end}}
+                    {{end}}
                 </section>
-            {{ end }}
+                
+            </section>
+        {{ end }}
 
-        </section>
-    {{end}}
-
+    </section>
 {{end}}	
