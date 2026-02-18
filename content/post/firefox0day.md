@@ -669,7 +669,7 @@ Here's the exploit in action, which we also teased on [Twitter](https://x.com/kq
 <video src="/images/firefox0day/exploit.mp4" width="100%" height="100%" controls> <video>
 
 ## Disclosure Timeline
-- January 19, 2026&nbsp;&nbsp;&nbsp;&nbsp;- The vulnerability was [introduced](github.com/mozilla-firefox/firefox/commit/fcc2f20e35ec).
+- January 19, 2026&nbsp;&nbsp;&nbsp;&nbsp;- The vulnerability was [introduced](https://github.com/mozilla-firefox/firefox/commit/fcc2f20e35ec).
 - February 3(?), 2026 - Another researcher independently reported [the same issue](https://bugzilla.mozilla.org/show_bug.cgi?id=2013739).
 - February 3, 2026&nbsp;&nbsp;&nbsp;&nbsp;- I filed [my report](https://bugzilla.mozilla.org/show_bug.cgi?id=2014014) within a 72h window from the researcher.
 - February 9, 2026&nbsp;&nbsp;&nbsp;&nbsp;- The vulnerability was fixed by commit [05ffcde](https://github.com/mozilla-firefox/firefox/commit/05ffcde977dfaf75399cbcccf0cf966e46065a76).
