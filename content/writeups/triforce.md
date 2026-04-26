@@ -1,9 +1,9 @@
 +++
-title = 'triforce - TRXCTF 2026 QUALS'
+title = 'triforce - TRX CTF Quals 2026'
 date = 2026-04-25T15:44:05+01:00
-draft = false
+draft = true
 author = 'Erge'
-summary = 'A V8 exploitation challenge I authored for TRXCTF 2026 QUALS'
+summary = 'A V8 exploitation challenge I authored for TRX CTF Quals 2026 '
 tags = [
     'V8',
     'Maglev'
@@ -15,7 +15,7 @@ toc = true
 Maglev (derived from magnetic levitation) is a system of rail transport whose rolling stock is levitated by electromagnets rather than rolled on wheels, eliminating rolling resistance.
 
 ## Challenge Overview
-The challenge is split into 2 parts, this one; where the objective is gaining arb R/W inside the v8 heap sandbox, and the second one ([Click here for the writeup!](https://example.com)) where the goal is escaping the sandbox and achieving code execution.
+The challenge is split into 2 parts, this one, where the objective is gaining R/W inside the V8 heap sandbox, and the second one ([Click here for the writeup!](/writeups/triforce-sbx/)) where the goal is escaping the sandbox and achieving code execution.
 
 Let's take a look at the provided V8 patches, in this post we will only be looking at `triforce.patch`, as `sbx.patch` is only relevant for the second part.
 
@@ -166,7 +166,9 @@ index 913a5c470c5..02332fcee68 100644
    static void WriteStdout(const v8::FunctionCallbackInfo<v8::Value>& info);
 ```
 
-By reading the builtin's code we can learn the win condition of the challenge; we need to provide a string that is equal to **"Power"**, **"Wisdom"** and **"Courage"** at the same time, with a 1-second interval in-between the string comparisons, we also need to provide a "real" string object, therefore it's not possible to use proxy objects or similar stuff.
+By reading the builtin's code we can learn the win condition of the challenge; we need to provide a string that is equal to **"Power"**, **"Wisdom"** and **"Courage"** at the same time, with a 1-second interval in-between the string comparisons. 
+
+We also need to provide a "real" string object, therefore it's not possible to use proxy objects or similar stuff.
 
 This might seem impossible at first, as strings are immutable in JS, but thanks to the arb R/W primitives we'll cook up due to the 2nd part of the patch we'll be able to get our flag.
 
@@ -198,7 +200,7 @@ index a607dc81a8d..c071240d17c 100644
 ```
 
 Leaving the issues aside... (Read them if you want a laugh)
-![discord.png](/content/images/triforce/discord.png)
+![discord.png](/images/triforce/discord.png)
 
 The patch is making `GetCheckType()` inside V8's mid-tier JIT compiler **Maglev** always return `CheckType::kOmitHeapObjectCheck`.
 
@@ -224,7 +226,7 @@ foo([1, 2, 3]);
 
 foo(0xbeef);
 ```
-In this case the function will be optimized by **Turbofan**, not Maglev, therefore it should de-optimize safely.
+In this case the function will be optimized by **Turbofan**, not Maglev, therefore it should deoptimize safely.
 
 Let's run it with this flag `--trace-deopt` to observe its behaviour:
 ```bash
