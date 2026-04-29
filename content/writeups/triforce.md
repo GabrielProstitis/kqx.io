@@ -1,7 +1,7 @@
 +++
 title = 'triforce - TRX CTF Quals 2026'
 date = 2026-04-25T15:44:05+01:00
-draft = true
+draft = false
 author = 'Erge'
 summary = 'A V8 exploitation challenge I authored for TRX CTF Quals 2026 '
 tags = [
@@ -264,7 +264,7 @@ Segmentation fault (core dumped)
 
 Due to the patch Maglev skips the necessary checks, and it ends up crashing because it's interpreting an Smi as an heap object, we therefore have a type confusion we can exploit.
 
-## The exploit
+## Exploitation Strategy
 Given this primitive there are plenty of paths one could take to exploit it, I'll explain the one I used, which while overcomplicated I believe to be interesting.
 
 Consider this snippet of code:
@@ -457,7 +457,10 @@ Segmentation fault (core dumped)
 
 We now have all we need to build our arb R/W primitives and get the flag from the **Triforce** method.
 
-We will simply be using a Worker thread to call the method with a specific thread while our main thread will concurrently modify the value of the string to pass the checks.
+We will simply be using a Worker thread to call the method in a loop while our main thread concurrently modifies the value of the string to pass the checks.
+
+## Flag
+`TRX{good_luck_for_part_2_0560574d8739cba5}`
 
 ## Full exploit
 ```js
