@@ -1,5 +1,5 @@
 +++
-title = 'krwd'
+title = 'krwd - TRX CTF Quals 2026'
 date = 2026-04-25T22:41:16+02:00
 draft = false
 author = 'prosti'
