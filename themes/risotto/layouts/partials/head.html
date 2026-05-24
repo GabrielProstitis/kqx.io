@@ -34,4 +34,11 @@
     <meta property="og:description" content="{{ .description }}"/> 
   {{ end }}
 {{ end }}
-{{ with .Site.Params.about }}<meta property="og:image" content="{{ with .logo_image }}{{ . | absURL }}{{ end }}" />{{ end }}
+
+{{ if isset .Params "image" }}
+  <meta property="og:image" content="{{ with .Params.image }}{{ . | absURL }}{{ end }}" />
+{{ else }}
+  {{ with .Site.Params.about }}
+    <meta property="og:image" content="{{ with .logo_image }}{{ . | absURL }}{{ end }}" />
+  {{ end }}
+{{ end }}
