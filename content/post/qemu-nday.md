@@ -6,8 +6,8 @@ author = 'prosti, leave, Erge'
 summary = 'Learn how to cheese kpwn challenges running on a Ubuntu 24.04 container using a nday on QEMU'
 tags = [
     'QEMU',
-    'x86',
-    'TCG'
+    'TCG',
+    'x86'
 ]
 toc = true
 +++

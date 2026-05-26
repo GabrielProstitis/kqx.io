@@ -5,6 +5,7 @@ draft = false
 author = 'prosti'
 summary = 'Cheesing challenges running on QEMU TCG from v9.1 on with this 0day'
 tags = [
+    '0day',
     'QEMU',
     'TCG'
 ]
