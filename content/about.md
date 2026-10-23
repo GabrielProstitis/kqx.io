@@ -12,6 +12,6 @@ We are three CTF players that enjoy breaking stuff that have to do with **kernel
 
 Alessio Ghidini (**@Erge**):<br>* pwner for [TRX](https://theromanxpl0.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)<br>* student @ [unipd](https://www.unipd.it/)
 
-Manuele Pandolfi (**@leave**):<br>* pwner for [TRX](https://theromanxpl0.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2025)<br>* student @ jk still a kiddo, when I'll start uni I'll let you know
+Manuele Pandolfi (**@leave**):<br>* pwner for [TRX](https://theromanxpl0.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2025, 2026)<br>* student @ [sapienza](https://www.uniroma1.it/)
 
-Gabriel Prostitis (**@prosti**):<br>* pwner for [TRX](https://theromanxpl0.it/) and [ToH](https://towerofhanoi.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025)<br>* student @ [polimi](https://www.polimi.it/)
+Gabriel Prostitis (**@prosti**):<br>* pwner for [TRX](https://theromanxpl0.it/) and [ToH](https://towerofhanoi.it/)<br>* member of [TeamItaly](https://teamitaly.eu/) 🇮🇹 (2024, 2025, 2026)<br>* student @ [polimi](https://www.polimi.it/)
