@@ -59,7 +59,7 @@ Just for the sake of completeness, HALs expose the "features" they support (and 
 
 ## The challenge
 
-Now that we've covered some background on android's security model and how applications can safely interact with kernel drivers, let's throw all this shit in the toilet and build a kernel driver that's directly accessible to userspace 🗣🗣
+Now that we've covered some background on android's security model and how applications can safely interact with kernel drivers, let's ignore all of this and build a kernel driver that's directly accessible to userspace 🗣🗣
 
 The source code is split across three files:
 - **`driver.c`**: character device registration;
@@ -123,7 +123,7 @@ Now you have everything you need. Can you spot the two vulns?
 
 There are two vulns in the driver: one leads to memory corruption, while the other (spoiler) lets us arbitrarily extend the race window.
 
-**Memory corruption:**
+Memory corruption:
 
 ```c
 *client = hf_client_create();
@@ -263,7 +263,7 @@ Okay, and? Well, a `kmalloc-2k` object spans two pages. The state for `SENSOR_TY
 Now we can outline the steps:
 - spray reclaim processes that allocate many pipes (only call `pipe()` so the `file` structs and `inode`s don't create noise);
 - spray `hf_client`s that will later be freed to flush the PCP lists (and which will initialize `milk_latency`, so the value specified here determines the actual hang time);
-- **STROKE THAT COW, BABY!!** 🐮🐮🐮🐮🐮🐮🐮🐮🐮🐮🐮🐮
+- MILK THAT COW, BABY!! 🐮🐮🐮🐮🐮🐮🐮🐮🐮🐮🐮🐮
 - allocate a new `hf_client` with a shorter latency to trigger the `manager_lock` hold;
 - spray attacker clients (using threads, since the calls won't return immediately) that will perform the write (in this configuration, the `latency` field will contain the fake **PTE** to inject into the page table);
 - ret2buddy:
@@ -567,3 +567,6 @@ int main(void) {
     return 0;
 }
 ```
+
+## Creds
+The challenge got no solves during the CTF, **@unvariant** got really good progress and managed to reach shellcode inside the vm; time and spray got between him and the flag unluckily ;(
