@@ -168,7 +168,7 @@ https://elixir.bootlin.com/linux/v7.3.1/source/arch/x86/kernel/ldt.c#L136
 But first of all, we should understand what that check is even for.
 
 `install_ldt()` sends IPIs to all the CPUs that are referenced in the bitmap of the current mm.
-> A memory map (`mm`) is a struct that represents a process's address space and, in this case, it's retrieved from `current`, which is the `task_struct` of the currently running process.  
+> A memory management struct (`mm`) represents a process's address space and, in this case, it's retrieved from `current`, which is the `task_struct` of the currently running process.  
 
 The patched check was meant to verify that the provided mm is the one installed on the current CPU, in other words it ensures that the current process hasn't changed in the meantime.
 
