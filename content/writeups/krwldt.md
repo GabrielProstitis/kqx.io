@@ -3,7 +3,7 @@ title = 'krwldt - TORX CTF 2026'
 date = 2026-11-11T15:22:22+01:00
 draft = false
 author = 'prosti & leo'
-summary = 'writeup by @leo_s0mething and me for a linux kernel pwn challenge for TORX CTF 2026'
+summary = 'writeup by @leo_something and me for a linux kernel pwn challenge for TORX CTF 2026'
 tags = [
     'linux', 'x86'
 ]
@@ -285,7 +285,7 @@ We need to:
 - call `commit_creds(init_cred)`
 - execute `swapgs` again to restore gs
 - execute `iret` with a custom frame to return to user space
-On **@leo**'s and my AMD CPU this worked just fine. When trying on **@leave**'s laptop the exploit never worked and always panicked. The exploit died each time it tried to execute the final `iret`.
+On **@leo_something**'s and my AMD CPU this worked just fine. When trying on **@leave**'s laptop the exploit never worked and always panicked. The exploit died each time it tried to execute the final `iret`.
 ### LPE attempt #2: ring 0 shellcode
 Since we had no clue on what the actual problem was, we decided to just not use `iret` (because why should you fix a problem when you can just ignore it, right?).
 The new plan was:
