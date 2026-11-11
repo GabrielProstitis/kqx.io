@@ -1,5 +1,5 @@
 +++
-title = 'krwldt'
+title = 'krwldt - TORX CTF 2026'
 date = 2026-11-11T15:22:22+01:00
 draft = false
 author = 'prosti & leo'
